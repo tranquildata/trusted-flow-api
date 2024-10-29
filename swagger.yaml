@@ -1,718 +1,1726 @@
----
-swagger: "2.0"
+# Copyright (c) 2023-2024, Tranquil Data, Inc. All rights reserved.
+
+# Note that this definition uses two patterns that OpenAPI generators ignore by default:
+#  1. alias to array
+#  2. form models
+# As such, to generate full documentatin or code from this specification you must set
+# "generateAliasAsModel" to true and "skipFormModel" to false. For instance, when using the
+# generator CLI you should specify:
+#   $ openapi-generator generate -i [file.yml] --generate-alias-as-model --global-property "skipFormModel=false" -g [...]
+
+openapi: 3.0.0
+
 info:
-  description: "This is a sample server Petstore server.  You can find out more about\
-    \ Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).\
-    \  For this sample, you can use the api key `special-key` to test the authorization\
-    \ filters."
-  version: "1.0.5"
-  title: "Swagger Petstore"
-  termsOfService: "http://swagger.io/terms/"
-  contact:
-    email: "apiteam@swagger.io"
+  title: Tranquil Data<sup>TM</sup> Trusted Flow Edition APIs
+  description: |
+    This is the complete API documentation for the product. It covers routines for
+    automating configuration, onboarding users and their guardians, asking for audited
+    decisions to be made, and redacting documents like CSVs.
+  version: 1.0.0
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "petstore.swagger.io"
-basePath: "/v2"
-tags:
-- name: "pet"
-  description: "Everything about your Pets"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
-- name: "store"
-  description: "Access to Petstore orders"
-- name: "user"
-  description: "Operations about user"
-  externalDocs:
-    description: "Find out more about our store"
-    url: "http://swagger.io"
-schemes:
-- "https"
-- "http"
-paths:
-  /pet/{petId}/uploadImage:
-    post:
-      tags:
-      - "pet"
-      summary: "uploads an image"
-      description: ""
-      operationId: "uploadFile"
-      consumes:
-      - "multipart/form-data"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to update"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "additionalMetadata"
-        in: "formData"
-        description: "Additional data to pass to server"
-        required: false
-        type: "string"
-      - name: "file"
-        in: "formData"
-        description: "file to upload"
-        required: false
-        type: "file"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/ApiResponse"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet:
-    post:
-      tags:
-      - "pet"
-      summary: "Add a new pet to the store"
-      description: ""
-      operationId: "addPet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    put:
-      tags:
-      - "pet"
-      summary: "Update an existing pet"
-      description: ""
-      operationId: "updatePet"
-      consumes:
-      - "application/json"
-      - "application/xml"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Pet object that needs to be added to the store"
-        required: true
-        schema:
-          $ref: "#/definitions/Pet"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-        405:
-          description: "Validation exception"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByStatus:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by status"
-      description: "Multiple status values can be provided with comma separated strings"
-      operationId: "findPetsByStatus"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "status"
-        in: "query"
-        description: "Status values that need to be considered for filter"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-          enum:
-          - "available"
-          - "pending"
-          - "sold"
-          default: "available"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid status value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /pet/findByTags:
-    get:
-      tags:
-      - "pet"
-      summary: "Finds Pets by tags"
-      description: "Multiple tags can be provided with comma separated strings. Use\
-        \ tag1, tag2, tag3 for testing."
-      operationId: "findPetsByTags"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "tags"
-        in: "query"
-        description: "Tags to filter by"
-        required: true
-        type: "array"
-        items:
-          type: "string"
-        collectionFormat: "multi"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid tag value"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-      deprecated: true
-  /pet/{petId}:
-    get:
-      tags:
-      - "pet"
-      summary: "Find pet by ID"
-      description: "Returns a single pet"
-      operationId: "getPetById"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet to return"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Pet"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-      security:
-      - api_key: []
-    post:
-      tags:
-      - "pet"
-      summary: "Updates a pet in the store with form data"
-      description: ""
-      operationId: "updatePetWithForm"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "petId"
-        in: "path"
-        description: "ID of pet that needs to be updated"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "name"
-        in: "formData"
-        description: "Updated name of the pet"
-        required: false
-        type: "string"
-      - name: "status"
-        in: "formData"
-        description: "Updated status of the pet"
-        required: false
-        type: "string"
-      responses:
-        405:
-          description: "Invalid input"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-    delete:
-      tags:
-      - "pet"
-      summary: "Deletes a pet"
-      description: ""
-      operationId: "deletePet"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "api_key"
-        in: "header"
-        required: false
-        type: "string"
-      - name: "petId"
-        in: "path"
-        description: "Pet id to delete"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /store/order:
-    post:
-      tags:
-      - "store"
-      summary: "Place an order for a pet"
-      description: ""
-      operationId: "placeOrder"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "order placed for purchasing the pet"
-        required: true
-        schema:
-          $ref: "#/definitions/Order"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid Order"
-  /store/order/{orderId}:
-    get:
-      tags:
-      - "store"
-      summary: "Find purchase order by ID"
-      description: "For valid response try integer IDs with value >= 1 and <= 10.\
-        \ Other values will generated exceptions"
-      operationId: "getOrderById"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of pet that needs to be fetched"
-        required: true
-        type: "integer"
-        maximum: 10
-        minimum: 1
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Order"
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-    delete:
-      tags:
-      - "store"
-      summary: "Delete purchase order by ID"
-      description: "For valid response try integer IDs with positive integer value.\
-        \ Negative or non-integer values will generate API errors"
-      operationId: "deleteOrder"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "orderId"
-        in: "path"
-        description: "ID of the order that needs to be deleted"
-        required: true
-        type: "integer"
-        minimum: 1
-        format: "int64"
-      responses:
-        400:
-          description: "Invalid ID supplied"
-        404:
-          description: "Order not found"
-  /store/inventory:
-    get:
-      tags:
-      - "store"
-      summary: "Returns pet inventories by status"
-      description: "Returns a map of status codes to quantities"
-      operationId: "getInventory"
-      produces:
-      - "application/json"
-      parameters: []
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "object"
-            additionalProperties:
-              type: "integer"
-              format: "int32"
-      security:
-      - api_key: []
-  /user/createWithArray:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithArrayInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/createWithList:
-    post:
-      tags:
-      - "user"
-      summary: "Creates list of users with given input array"
-      description: ""
-      operationId: "createUsersWithListInput"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "List of user object"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-  /user/{username}:
-    get:
-      tags:
-      - "user"
-      summary: "Get user by user name"
-      description: ""
-      operationId: "getUserByName"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be fetched. Use user1 for testing. "
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-    put:
-      tags:
-      - "user"
-      summary: "Updated user"
-      description: "This can only be done by the logged in user."
-      operationId: "updateUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "name that need to be updated"
-        required: true
-        type: "string"
-      - in: "body"
-        name: "body"
-        description: "Updated user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        400:
-          description: "Invalid user supplied"
-        404:
-          description: "User not found"
-    delete:
-      tags:
-      - "user"
-      summary: "Delete user"
-      description: "This can only be done by the logged in user."
-      operationId: "deleteUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "path"
-        description: "The name that needs to be deleted"
-        required: true
-        type: "string"
-      responses:
-        400:
-          description: "Invalid username supplied"
-        404:
-          description: "User not found"
-  /user/login:
-    get:
-      tags:
-      - "user"
-      summary: "Logs user into the system"
-      description: ""
-      operationId: "loginUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - name: "username"
-        in: "query"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      - name: "password"
-        in: "query"
-        description: "The password for login in clear text"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          headers:
-            X-Expires-After:
-              type: "string"
-              format: "date-time"
-              description: "date in UTC when token expires"
-            X-Rate-Limit:
-              type: "integer"
-              format: "int32"
-              description: "calls per hour allowed by the user"
-          schema:
-            type: "string"
-        400:
-          description: "Invalid username/password supplied"
-  /user/logout:
-    get:
-      tags:
-      - "user"
-      summary: "Logs out current logged in user session"
-      description: ""
-      operationId: "logoutUser"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters: []
-      responses:
-        default:
-          description: "successful operation"
-  /user:
-    post:
-      tags:
-      - "user"
-      summary: "Create user"
-      description: "This can only be done by the logged in user."
-      operationId: "createUser"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/xml"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Created user object"
-        required: true
-        schema:
-          $ref: "#/definitions/User"
-      responses:
-        default:
-          description: "successful operation"
-securityDefinitions:
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "https://petstore.swagger.io/oauth/authorize"
-    flow: "implicit"
-    scopes:
-      read:pets: "read your pets"
-      write:pets: "modify pets in your account"
-definitions:
-  ApiResponse:
-    type: "object"
-    properties:
-      code:
-        type: "integer"
-        format: "int32"
-      type:
-        type: "string"
-      message:
-        type: "string"
-  Category:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Category"
-  Pet:
-    type: "object"
-    required:
-    - "name"
-    - "photoUrls"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      category:
-        $ref: "#/definitions/Category"
-      name:
-        type: "string"
-        example: "doggie"
-      photoUrls:
-        type: "array"
-        xml:
-          wrapped: true
-        items:
-          type: "string"
-          xml:
-            name: "photoUrl"
-      tags:
-        type: "array"
-        xml:
-          wrapped: true
-        items:
-          xml:
-            name: "tag"
-          $ref: "#/definitions/Tag"
-      status:
-        type: "string"
-        description: "pet status in the store"
-        enum:
-        - "available"
-        - "pending"
-        - "sold"
-    xml:
-      name: "Pet"
-  Tag:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      name:
-        type: "string"
-    xml:
-      name: "Tag"
-  Order:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      petId:
-        type: "integer"
-        format: "int64"
-      quantity:
-        type: "integer"
-        format: "int32"
-      shipDate:
-        type: "string"
-        format: "date-time"
-      status:
-        type: "string"
-        description: "Order Status"
-        enum:
-        - "placed"
-        - "approved"
-        - "delivered"
-      complete:
-        type: "boolean"
-    xml:
-      name: "Order"
-  User:
-    type: "object"
-    properties:
-      id:
-        type: "integer"
-        format: "int64"
-      username:
-        type: "string"
-      firstName:
-        type: "string"
-      lastName:
-        type: "string"
-      email:
-        type: "string"
-      password:
-        type: "string"
-      phone:
-        type: "string"
-      userStatus:
-        type: "integer"
-        format: "int32"
-        description: "User Status"
-    xml:
-      name: "User"
+
 externalDocs:
-  description: "Find out more about Swagger"
-  url: "http://swagger.io"
+  description: "Find out more about Tranquil Data"
+  url: "https://tranquildata.com"
+
+tags:
+  - name: root
+    description: Core health and management routines
+  - name: user
+    description: User-oriented routines
+  - name: decision
+    description: Decision-oriented routines
+  - name: redact
+    description: Document redaction routines
+  - name: config
+    description: Policy and system configuration routines
+  - name: mapping
+    description: Record mapping routines
+
+servers:
+  - url: http://localhost
+
+paths:
+
+  #
+  # Root API paths
+  #
+
+  /:
+
+    head:
+      tags:
+        - root
+      summary: Test that this peer is running and ready
+      operationId: checkPeer
+      responses:
+        '200':
+          description: The peer is available and responsive
+        '500':
+          description: There is some internal error with the peer
+
+  #
+  # User API paths
+  #
+
+  /user:
+
+    get:
+      tags:
+        - user
+      summary: Returns details of the requested user, like their attributes and consents
+      description: See [upsertUser()](#api-User-upsertUser) for details about user attributes and contractual relationships.
+      operationId: getUser
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Identifier of the user whose details are being retrieved
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserExtended'
+              example:
+                userId: Alice
+                attributes:
+                  - state: CA
+        '400':
+          description: No identifier was provided
+        '404':
+          description: The identified user is unknown
+        '500':
+          description: There was an internal error attempting to resolve the user's status
+
+    put:
+      tags:
+        - user
+      summary: Creates or updates a user and their details
+      description: |
+        This routine creates a "user" such that data can be associated, relationships can be formed, and
+        personalied decisions can be made. A user may be created or updated for many reasons, but the four
+        most common flows are:
+        1. A person comes to the platform on their own to create an account as a "first-party", and after that
+           user is created, platform terms will be accepted so that the user may interact with the platform
+        2. A user comes to the platform through an employer, partner, health plan, etc., to create an account
+           "as a first-party" (as above) that also has a contractual relationship
+        3. A third-party contract leads to data-exchange, such that users are created in association with
+           the data that is onboarded, even though those users are not themselves interacting with the platform
+        4. A guardian comes to the platform to support their child, and while they are not users of the
+           platform themselves they must tracked as a user to establish the relationship and associated rights
+        
+        The set of `attributes` may contain arbitrary values, but the following are used in evaluting platform
+        configuration:
+        * `dob` represents the date of birth used in overrides and in determining if somone is treated as a
+          child. The value is a string in ISO 8601 form like `2017-01-23` 
+        * `location` represents the physical location used in overides.
+      operationId: upsertUser
+      requestBody:
+        description: upserts a user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCore'
+            example:
+                userId: Alice
+                attributes:
+                  - state: CA
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: The expected request content was not provided
+        '500':
+          description: There was an internal error saving the updated user
+
+  /user/children:
+
+    get:
+      tags:
+        - user
+      summary: Returns a guardian's related children and any associated settings like disabled third party sharing
+      description: >
+        A child is any user who has been connected to a guardian via the [upsertGuardian()](#api-User-upsertGuardian) call. Platform
+        configuration supports setting a threshold age, above which a user is never considered a child. If
+        a given user has a `dob` attribute that means they are older than the thredhold, then they will
+        never be returned by this routine.
+      operationId: getChildren
+      parameters:
+        - in: query
+          name: guardianId
+          schema:
+            type: string
+          required: true
+          description: Identifier of the guardian who is requesting details about their related children
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserChildrenList'
+              example:
+                guardianId: Carol
+                children:
+                  - childId: Alice
+                  - childId: Bob
+                    deniedThirdParties:
+                      - purpose: "TrainAlgorithm"
+                        thirdParties:
+                          - "OpenAI"
+        '400':
+          description: No identifier was provided for the guardian
+        '404':
+          description: The identified user is unknown, or is not a guardian
+        '500':
+          description: There was an internal error attempting to resolve the guardian's related children
+
+  /user/consent:
+
+    put:
+      tags:
+        - user
+      summary: Updates the set of discretionary consents for a given user
+      description: |
+        This routine creates or updates the set of discretionary consents, granted by a given user, as governed
+        by platform terms. Once a user has agreed to terms, they may consent to share their data via any of three mechanisms:
+        1. *Platform Opt-Ins* grant access to a fixed set of categories of the user's data, for use on the platform or sharing
+            for plarform purposes, in exchange for some stated value back to the user. A common example would be a user opting-in
+            to marketing emails in-exchange for discounts or early access.
+        2. *Affirmative Consents* allow a user to share under one or more relationships, where some other party has requested
+            specific categories but the user is free to share all or a subset of those categories. Common examples would be sharing
+            between multiple applications from the same company, or sharing data with a research group in-exchange for feedback to the user.
+        3. *Personal Sharing* allows a user to share categories of their choice with any other known user. Common examples would be sharing
+            with a family member or a friend.
+
+        At any point a user may change the scope of their consents. A call to this routine that names a specific consent with no
+        categories will revoke that consent relationship.
+      operationId: upsertConsent
+      requestBody:
+        description: Acknowledges consent from a user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserGrant'
+            example:
+              userId: 'Alice'
+              consents:
+                optIns:
+                  - 'Marketing Email'
+                affirmativeConsents:
+                  - purpose: 'Train Algorithm'
+                    terms: 'AI startup3'
+                    categories:
+                      - email
+                      - address
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: No content was provided or the content is invalid
+        '403':
+          description: An Affirmative Consent attempted to grant more categories then those requested
+        '404':
+          description: The identified user is unknown, or has not agreed to platform terms
+        '500':
+          description: There was an internal error attempting to update the given user's consents
+
+  /user/guardians:
+
+    get:
+      tags:
+        - user
+      summary: Returns the child's related guardians
+      description: >
+        See [getChildren()](#api-User-getChildren) for the criteria used to determine active child-guardian relationships.
+      operationId: getGuardians
+      parameters:
+        - in: query
+          name: childId
+          schema:
+            type: string
+          required: true
+          description: Identifier of the child who is requesting details about their related guardians
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserGuardianList'
+        '400':
+          description: No identifier was provided for the child
+        '404':
+          description: The identified user is unknown, or is not a child
+        '500':
+          description: There was an internal error attempting to resolve the child's guardians
+
+    put:
+      tags:
+        - user
+      summary: Creates or updates a guardian-child relationship between two existing users, including any controls that the guardian chooses to set for their child
+      description: >
+        This routine is used to establish or update a relationship between a guardian and a child. Both users must already exist. Any
+        provided controls will be merged with preferences from other guardians. For instance, if a child has two guardians, and each guardian
+        explicitly disallows sharing with a different third-party, then a call to [getChildren()](#api-User-getChildren) for either guardian
+        will result in a child that has both third-parties disabled.
+      operationId: upsertGuardian
+      requestBody:
+        description: Any controls, including specific third-parties that cannot have the child's data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertGuardianInfo'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: The expected request content was not provided
+        '404':
+          description: Either identified user is unknown
+        '500':
+          description: There was an internal error creating or updating the relationship
+
+  /user/guardians/options:
+
+    get:
+      tags:
+        - user
+      summary: Returns the options that any guardian has for accessing child data and setting controls
+      description: >
+        This call returns the global options and controls that any guardian has in-support of their
+        children. This includes details like the threshold age when a user is no longer considered a 
+        child, the catgegories of data that a parent has access to read, and the specific platform
+        sharing flows that can be turned-off on a per-child basis.
+      operationId: getGuardianOptions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/GuardianAccess'
+        '500':
+          description: There was an internal error retrieving the guardian options
+
+  /user/status:
+
+    get:
+      tags:
+        - user
+      summary: Returns the status of the given user, including whether they need to re-accept platform terms
+      description: |
+        This routine is used to discover when the given user last accepted platform terms and whether they need
+        to accept the latest terms, typically because something that applies to this user has beed added or was
+        changed "expansively." If the user exists but is not a first-party user who has ever accepted terms,
+        such as a identity created through a third-party exchange or a guardian who is not a user of the platform,
+        then no status is returned.
+
+        A common flow is to call this routine wenever a user logs in to the platform. If the routine returns `200`
+        and the value of `reacceptRequired` is true, then the next step is get the personal terms for the user,
+        ask the user to accept the new terms, and then record that via [acceptTerms()](#api-User-acceptTerms).
+        Once the new terms have been accepted, the status will go back to returning false until there is something
+        new for the user to accept.
+      operationId: getStatus
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Identifier of the user whose status is being retrieved
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserStatus'
+              example:
+                userId: Alice
+                latestTerms: 1691872205794
+                reacceptRequired: true
+        '400':
+          description: The user identifier was missing
+        '404':
+          description: The identified user is unknown, or has not yet accepted platform terms
+        '500':
+          description: There was an internal error attempting to resolve the user's status
+
+  /user/terms:
+
+    get:
+      tags:
+        - user
+      summary: Returns the personalized terms that apply to a given, existing user
+      description: >
+        This routine returns the subset of platform terms that specifically apply to the identified user.
+        The typical flow is that when a user first creates an account, personal terms are retrieved via
+        the [getContextualTerms()](#api-User-getContextualTerms) routine to show a user what they are accepting.
+        Once that user is created, then any further need to get the personal set (e.g., to display a "privacy
+        nutrition label" to a user, or to use when new terms must be accepted) is done through this routine.
+      operationId: getPersonalTerms
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Identifier of the user whose terms are being retrieved
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPersonalTerms'
+        '400':
+          description: The user identifier was missing
+        '404':
+          description: The identified user is unknown
+        '500':
+          description: There was an internal error retrieving the personalized terms
+
+    put:
+      tags:
+        - user
+      summary: Records that the given user has accepted the current platform terms
+      description: |
+        This routine is used to tell Tranquil Data that the identified user has accepted the current
+        platform terms. It is up to the caller to ensure either that the user's personal terms have been
+        shown to the user, or some process was run leading the user to accept terms. Typically this
+        routine needs to be called when a user is first created, and subsequently whenener a call to
+        [getStatus()](#api-User-getStatus) says that the user need to accept new terms.
+        
+        The acceptor property is used only if someone other than the identified user is accepting rights
+        for that user. One common example is when guardians review and accept terms on behalf of their
+        children.
+      operationId: acceptTerms
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: string
+          required: true
+          description: Identifier of the user who is accepting the platform terms
+        - in: query
+          name: acceptorId
+          schema:
+            type: string
+          required: false
+          description: The optional identifier of the user who is invoking this endpoint (by default the value of userId is assumed)
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: The user identifier was missing
+        '404':
+          description: The identified user is unknown
+        '500':
+          description: There was an internal error saving the accepted terms
+
+  /user/terms/query:
+
+    get:
+      tags:
+        - user
+      summary: Returns the personalized terms based on the provided context without requiring an existing user
+      description: >
+        This routine is used to generate a preview of user terms based upon the user's context, without requiring an existing user
+        in the system. This routine returns the subset of platform terms that specifically apply to the user context, and is
+        intended for use early in onboarding so that a preview of terms can be presented to a potential user without having to delete
+        user state if that user declines. If the user proceeds, then the rest of the onboarding flow should continue (e.g. create a user,
+        accept terms, and configure any discretionary consents). This routine may also be used to generate previews for the platform 
+        itself to verify that policy terms match what is expected and for internal debugging and development.
+      operationId: getContextualTerms
+      parameters:
+        - in: query
+          description: the location
+          name: location
+          schema:
+            type: string
+          required: false
+        - in: query
+          description: The date of birth. The value is a string in ISO 8601 form like `2017-01-23` 
+          name: dob
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: contractualPurpose
+          description: the purpose of a contractual relationship, which requires a value for `contractualTerms`
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: contractualTerms
+          description: the terms of a contractual relationship, which requires a value for `contractualPurpose`
+          schema:
+            type: string
+          required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPersonalTerms'
+        '400':
+          description: The contractual purpose or terms are missing or malformed
+        '404':
+          description: The contractual purpose or terms are unknown
+        '500':
+          description: There was an internal error generating the personalized terms from context
+
+    put:
+      tags:
+        - user
+      summary: Returns the personalized terms based on the provided context without requiring an existing user
+      description: >
+        This routine is used to generate a preview of user terms based upon provided context values without requiring an existing user
+        in the system. This routine returns the subset of platform terms that specifically apply to the provided user context, and is
+        intended for use early in onboarding so that a preview of terms can be presented to a potential user without having to delete
+        user state if that user declines. If the user proceeds, then the rest of the onboarding flow should continue (e.g. create a user,
+        accept terms, and configure any discretionary consents). This routine may also be used to generate previews for the platform 
+        itself to verify that policy terms match what is expected and for internal debugging and development.
+      operationId: getTermsFromContext
+      requestBody:
+        description: The user context properties and relationships for framing personalized terms
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTermsQuery'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPersonalTerms'
+        '400':
+          description: The contractual purpose or terms are missing or malformed
+        '404':
+          description: The contractual purpose or terms are unknown
+        '500':
+          description: There was an internal error generating the personalized terms from context
+
+  #
+  # Decision API paths
+  #  
+
+  /decision:
+
+    put:
+      tags:
+        - decision
+      summary: Returns a decision and rationale for using data against a stated purpose
+      operationId: getDecisionForPurpose
+      parameters:
+        - $ref: '#/components/parameters/PurposeQueryParameter'
+        - $ref: '#/components/parameters/UseQueryParameter'
+        - $ref: '#/components/parameters/SubjectQueryParameter'
+        - $ref: '#/components/parameters/MappingGroupQueryParameter'
+      requestBody:
+        description: the decision request, specifying the fields requested, the requestor, purpose, and the resource subject
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionQuery'
+            example:
+              fields:
+                - name: user_id
+                  value: user1234
+                - name: service_provider
+                  value: DoctorExample
+                - name: date_of_service
+                  value: 01-01-1970
+              returnAllowedFields: true
+      responses:
+        '200':
+          description: The requested purpose is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionResponse'
+              example:
+                permitted: true
+                message: Contractual rights allow access to the requested member categories
+        '409':
+          description: The requested purpose is invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecisionResponse'
+              example:
+                permitted: false
+                message: User does not have a contractual relationship with the requestor
+
+  #
+  # Redaction API paths
+  #
+
+  /redact/document:
+
+    put:
+      tags:
+        - redact
+      summary: Redact a single document for a stated purpose, removing any fields (or entire records) that are not allowed.
+      description: |
+        This routine takes a supported document format and redacts it for responsible use based on the stated purpose. A
+        receipt is returned immediately which includes details about how to check on the redaction process and download the
+        prepared version of the document when the process is done. The document is assumed to contain one or more records,
+        each of which is evaluated independently.
+        
+        The specified `mappingGroup` (or the default group, if no group is named) is used to map record fields to their associated
+        caegories. If a given record has an associated user (as identified via the `resourceContext` flag specified when calling
+        [upsertMappingGroup()](#api-Mapping-upsertMappingGroup)) then that user's context will be used in evaluation. As a
+        result, the rationale for the decision made about any given record, and the subsequent fields that are redacted,
+        may change with each given record. Any field in a record that is not defined in the chosen `mappingGroup` will
+        be redacted in the final document.
+
+        For documents of type `text/csv`, the content must be a standard CSV document in text form that starts with a single
+        "header" line naming all of the fields in the document. Each of the following rows is treated as a single `record` and
+        evaluated independently. Both the header row and all following record rows must be comma-separated. 
+      operationId: redactDocument
+      parameters:
+        - $ref: '#/components/parameters/PurposeQueryParameter'
+        - $ref: '#/components/parameters/UseQueryParameter'
+        - $ref: '#/components/parameters/SubjectQueryParameter'
+        - $ref: '#/components/parameters/MappingGroupQueryParameter'
+      requestBody:
+        description: The full document to redact.
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedactionReceipt'
+        '400':
+          description: The type was missing, or the type requires a purpose and/or subject that was missing
+        '500':
+          description: There was an internal error attempting to schedule redaction
+
+    get:
+      tags:
+        - redact
+      summary: Returns the redacted document, when it's available.
+      operationId: getRedactedDocument
+      parameters:
+        - name: jobName
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The unique redaction job name for this document.
+      responses:
+        '200':
+          description: The full, redacted, document.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+        '400':
+          description: The redaction job name was missing from the request, or the job name is unknown.
+        '404':
+          description: The job is still running. 
+        '500':
+          description: There was an internal error reading or loading the filtered document, or the job failed.
+
+  /redact/stats:
+
+    get:
+      tags:
+        - redact
+      summary: Returns the statistics for a given redaction job.
+      operationId: getRedactionStats
+      parameters:
+        - name: jobName
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The name of a running job.
+      responses:
+        '200':
+          description: The job is complete and the statistics are in the response body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RedactionStats'
+        '400':
+          description: The redaction job name was missing from the request, or the job name is unknown.
+        '404':
+          description: The job is still running.
+        '500':
+          description: There was an internal error returning the stats for a finished job, or the job failed.
+ 
+  #
+  # Config API paths
+  #
+
+  /config/categories:
+
+    get:
+      tags:
+        - config
+      summary: Returns one or all configured categories.
+      operationId: getCategories
+      parameters:
+        - in: query
+          name: categoryId
+          schema:
+            type: string
+          required: false
+          description: if present, only the named category will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/Categories'
+        '404':
+          description: A categoryId was present, but the identified category is unknown.
+        '500':
+          description: An internal error occured trying to retrieve the requested categories.
+
+    put:
+      tags:
+        - config
+      summary: Upserts category definitions. If the category is already defined, it is replaced with the provided definition. If the category is not defined it is created and added to the set of categories.
+      operationId: upsertCategories
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: The categories to apply.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/Categories'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/user-access:
+
+    get:
+      tags:
+        - config
+      summary: Returns the configured user access rights.
+      operationId: getUserAccess
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/UserAccess'
+        '500':
+          description: An internal error occured trying to retrieve the user access rights.
+
+    put:
+      tags:
+        - config
+      summary: create or replace default user access rules. The default user access configuration is replaced with the request body content.
+      operationId: replaceUserAccess
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the user access rules
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/UserAccess'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/user-access/guardian:
+
+    get:
+      tags:
+        - config
+      summary: Returns the configured guardian user access rules.
+      operationId: getGuardianAccess
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/GuardianAccess'
+        '500':
+          description: An internal error occured trying to retrieve the user access rights.
+
+    put:
+      tags:
+        - config
+      summary: configure guardian user access rules. Replaces the configured rules with the input request body.
+      operationId: replaceGuardianAccess
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the access rules for guardians of users who are children
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/GuardianAccess'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/platform-use:
+
+    get:
+      tags:
+        - config
+      summary: Returns one or all configured platform use purposes.
+      operationId: getPlatormUses
+      parameters:
+        - in: query
+          name: purposeName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named purpose will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/PlatformUsePurposes'
+        '404':
+          description: A purposeName was present, but the identified platform use purpose is unknown.
+        '500':
+          description: An internal error occured trying to retrieve the requested platform use purpose.
+
+    put:
+      tags:
+        - config
+      summary: Creates or replaces platform uses. Replaces the configured platform uses with the input request body.
+      operationId: replacePlatformUses
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the platform use purposes
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/PlatformUsePurposes'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/platform-sharing:
+
+    get:
+      tags:
+        - config
+      summary: Returns one or all configured platform sharing purposes.
+      operationId: getPlatormSharing
+      parameters:
+        - in: query
+          name: purposeName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named purpose will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
+        '404':
+          description: A purposeName was present, but the identified platform sharing purpose is unknown.
+        '500':
+          description: An internal error occured trying to retrieve the requested platform sharing purpose.
+
+    put:
+      tags:
+        - config
+      summary: Replace third party groups configuration. Replaces the configuration of platform sharing purposes with the request body.
+      operationId: replacePlatformSharing
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: The set of platform sharing purposes to configure
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+  
+  /config/consented-sharing:
+
+    get:
+      tags:
+        - config
+      summary: Returns one or all configured consented sharing purposes.
+      operationId: getConsentedSharing
+      parameters:
+        - in: query
+          name: purposeName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named purpose will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/ConsentedSharingPurposes'
+        '404':
+          description: A purposeName was present, but the identified consented sharing purpose is unknown.
+        '500':
+          description: An internal error occured trying to retrieve the requested consented sharing purpose.
+
+    put:
+      tags:
+        - config
+      summary: configure consented sharing purposes. Replaces the consented sharing configuration with the request body configuration.
+      operationId: replaceConsentedSharing
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the third party groups
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/ConsentedSharingPurposes'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+  
+  /config/contractual-exchange:
+
+    get:
+      tags:
+        - config
+      summary: Returns one or all configured contractual exchange purposes.
+      operationId: getContractualExchange
+      parameters:
+        - in: query
+          name: purposeName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named purpose will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/ContractualExchangePurposes'
+        '404':
+          description: A purpose was present but is unknown.
+        '500':
+          description: An internal error occured trying to retrieve the requested contractual exchange purpose.
+
+    put:
+      tags:
+        - config
+      description: >
+        Configure contractual exchange purposes. If no contractual exchange is configured, this endpoint will create contractual
+        exchange configuration. If there is an existing configuration, then the input contractual exchange configuration will be
+        merged with the existing configuration. Contract terms will be merged if a third party with the same name is already defined
+        for an input purpose. Contract terms without an existing counterpart will be created and added to the existing purpose.
+      operationId: upsertContractualExchange
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the contractual exchange purposes
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/ContractualExchangePurposes'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+  
+  /config/reconsent-default:
+
+    put:
+      tags:
+        - config
+      summary: The defined behavior is replaced with the input behavior.
+      operationId: configureReconsent
+      requestBody:
+        description: the reconsent configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/ChangedTermsDefaultBehavior'
+      responses:
+        '200':
+          description: configuration was successful
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/platform-sharing/overrides:
+
+    put:
+      tags:
+        - config
+      summary: The override definitions for platform sharing will be replaced with the request body configuration.
+      operationId: replacePlatformSharingOverrides
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the override configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/PlatformSharingOverrides'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '404':
+          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+    get:
+      tags:
+        - config
+      summary: get one or all of the platform sharing overrides
+      operationId: getPlatformSharingOverrides
+      parameters:
+        - in: query
+          name: overrideName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named override will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/PlatformSharingOverrides'
+        '404':
+          description: An overrideName was present, but the identified override is unknown.
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/user-access/overrides:
+
+    put:
+      tags:
+        - config
+      summary: The definition of user access overrides will be replaced by the request body configuration.
+      operationId: replaceUserAccessOverrides
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the override configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/UserAccessOverrides'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '404':
+          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+    get:
+      tags:
+        - config
+      summary: get one or all of the user access overrides
+      operationId: getUserAccessOverrides
+      parameters:
+        - in: query
+          name: overrideName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named override will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/UserAccessOverrides'
+        '404':
+          description: An overrideName was present, but the identified override is unknown.
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/platform-use/overrides:
+
+    put:
+      tags:
+        - config
+      summary: configure platform use overrides. The platform use override definition will be replaced by the input request body configuration.
+      operationId: replacePlatformUseOverrides
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the override configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/PlatformUseOverrides'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '404':
+          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+    get:
+      tags:
+        - config
+      summary: get one or all of the platform use overrides
+      operationId: getPlatformUseOverrides
+      parameters:
+        - in: query
+          name: overrideName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named override will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/PlatformUseOverrides'
+        '404':
+          description: An overrideName was present, but the identified override is unknown.
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config:
+
+    get:
+      tags:
+        - config
+      summary: returns the entire configuration
+      operationId: getFullConfig
+      responses:
+        '200':
+          description: request was successful, summaries are in the response body
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/FullConfiguration'
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+    put:
+      tags:
+        - config
+      summary: create the entire configuration. The full existing configuration will be replaced with the input configuration.
+      operationId: createFullConfig
+      requestBody:
+        description: the entire configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/FullConfiguration'
+      responses:
+        '200':
+          description: configuration was successful
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  #
+  # Mapping API paths
+  #  
+
+  /mapping/groups:
+    get:
+      tags:
+        - mapping
+      summary: returns either a specific mapping group or all of the mapping groups
+      operationId: getMappingGroups
+      parameters:
+        - in: query
+          name: mappingGroup
+          schema:
+            type: string
+          required: false
+          description: The name of the group to fetch. If not provided, all groups are returned.
+      responses:
+        '200':
+          description: OK
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/MappingGroups'
+        '404':
+          description: The group name is unknown, or no name was provided and there is no default group.
+        '500':
+          description: an internal error when retrieving group information, details will be in the response body
+    
+    put:
+      tags:
+        - mapping
+      summary: Replaces or creates a mapping group. If a mapping group with the same name is already defined, the provided definition will replace it.
+      operationId: upsertMappingGroup
+      requestBody:
+        description: the updated or new group
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MappingGroup'
+      responses:
+        '200':
+          description: upsert was successful
+        '400':
+          description: There was an error in the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred during update, any error message will be in the response body
+
+    delete:
+      tags:
+        - mapping
+      summary: remove a mapping group
+      operationId: deleteMappingGroup
+      parameters:
+        - in: query
+          name: mappingGroup
+          schema:
+            type: string
+          required: false
+          description: The name of the group to delete
+      responses:
+        '200':
+          description: the delete was processed
+        '400':
+          description: a value for mappingGroup was missing, any error message will be in the response body
+        '500':
+          description: an internal error ocurred while processing the delete, any error message will be in the response body
+
+
+components:
+
+  parameters:
+
+    #
+    # Parameters used across APIs
+    #
+
+    PurposeQueryParameter:
+      name: purpose
+      in: query
+      required: false
+      description: |
+        The purpose of the request. No purpose is required for the `userAccess` request type. For all other request
+        types a valid purpose is required.
+
+        For `platformUse` and `platfromSharing` the purpose must be one of the purposes named in configuration. For
+        `contractualExchange` and `consentedSharing` the purpose must be one of the groups named in configuration. 
+      schema:
+        type: string
+
+    UseQueryParameter:
+      name: type
+      in: query
+      required: true
+      description: |
+        The type of use being requested:
+
+        * `platformUse` requests are for the platform's own internal data use
+        * `platformSharing` requests are when the platform needs to share data with third parties to fulfil a specified purpose
+        * `userAccess` requests are when a user of the platform is trying to access data
+        * `contractualExchange` requests are when a third party that has partnered with the platform is exchanging data with the platform
+        * `consentedSharing` requests are for third parties that users have explicitly consented to share with
+      schema:
+        type: string
+        enum:
+          - platformUse
+          - platformSharing
+          - userAccess
+          - contractualExchange
+          - consentedSharing
+
+    SubjectQueryParameter:
+      name: subject
+      in: query
+      required: false
+      description: |
+        The requestor who is asserting the given purpose for the given type of request. No subject is required for
+        the `platformUse` type. For all other request types a valid subject is required.
+
+        For `platformSharing` the subject must be one of the third parties from the stated purpose. For `userAccess` the
+        subject must be a user provisioned via [upsertUser()](#api-User-upsertUser). For `contractualExchange` and
+        `consentedSharing` the subject must part of the identified purpose group.
+      schema:
+        type: string
+
+    MappingGroupQueryParameter:
+      name: mappingGroup
+      in: query
+      required: false
+      description: The optional name of the mapping group to use. If no name is provided, the default group is chosen.
+      schema:
+        type: string
+
+  schemas:
+
+    #
+    # Structures used by the User APIs
+    #
+
+    UserStatus:
+      type: object
+      properties:
+        userId:
+          type: string
+        latestTerms:
+          type: integer
+          description: the unix timestamp (the number of seconds since jan 1, 1970) of when the user last accepted platform terms
+        reacceptRequired:
+          type: boolean
+          description: whether any expansive changes to terms that apply to the given identity have been made, requiring the user to re-accept terms
+      required:
+        - userId
+        - latestTerms
+        - reacceptRequired
+
+    ContractualRelationship:
+      type: object
+      properties:
+        purpose:
+          type: string
+          description: the purpose of the contractual relationship
+        terms:
+          type: string
+          description: the terms of the contractual relationship
+      required:
+        - purpose
+        - thirdParty
+
+    UserPersonalTerms:
+      type: object
+      properties:
+        categories:
+          $ref: './config_schema.yml#/components/schemas/Categories'
+        platformUse:
+          $ref: './config_schema.yml#/components/schemas/PlatformUsePurposes'
+        platformSharing:
+          $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
+        userAccess:
+          $ref: './config_schema.yml#/components/schemas/UserAccess'
+        contractualExchange:
+          allOf:
+            - $ref: '#/components/schemas/ContractualRelationship'
+            - type: object
+              properties:
+                categories:
+                  description: the categories of data associated with the user shared with the contractual entity
+                  $ref: './config_schema.yml#/components/schemas/CategoryIdentifiers'
+              required:
+                - categories
+          title: ContractualCategories
+      required:
+        - categories
+        - platformUse
+        - platformSharing
+        - userAccess
+
+    UserTermsQuery:
+      type: object
+      properties:
+        attributes:
+          description: a mapping of user attributes names to values
+          type: object
+        contractualRelationship:
+          description: the contractual relationship (if any) that the user is entering the system under
+          $ref: '#/components/schemas/ContractualRelationship'
+
+    AffirmativeConsentRelationship:
+      type: object
+      properties:
+        purpose:
+          type: string
+          description: the purpose of the consented sharing
+        terms:
+          type: string
+          description: the terms describing this consented sharing
+        categories:
+          type: array
+          description: the set of categories that a user consents to share through this relationship
+          items:
+            type: string
+      required:
+        - consentedParty
+        - purpose
+
+    PersonalSharingRelationship:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: the identity of a user who is allowed shared data through this relationship
+        categories:
+          type: array
+          description: the set of categories that a user consents to share through this relationship
+          items:
+            type: string
+      required:
+        - userId
+
+    UserDiscretionaryConsents:
+      type: object
+      properties:
+        affirmativeConsents:
+          description: a list of all the affirmative consents that the user has granted
+          type: array
+          items:
+            $ref: '#/components/schemas/AffirmativeConsentRelationship'
+        personalSharing:
+          description: a list of all the user-specific sharing that a user has consented to
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonalSharingRelationship'
+        optIns:
+          type: array
+          description: a list of all the opt-in purposes the user consented to
+          items:
+            type: string
+
+    UserGrant:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: the user who is granting consent
+        grantorId:
+          type: string
+          description: >
+            the optional user who is granting consent on behalf of the identified user (e.g., in a model where
+            a guardian is allowed to grant consent on behalf of their chldren)
+        consents:
+          description: the accepted consents
+          $ref: '#/components/schemas/UserDiscretionaryConsents'
+      required:
+        - userId
+        - consents
+
+    UserCore:
+      type: object
+      properties:
+        userId:
+          type: string
+        attributes:
+          description: a mapping of user attributes names to values
+          type: object
+          additionalProperties:
+            type: string
+        contractualRelationship:
+          $ref: '#/components/schemas/ContractualRelationship'
+      required:
+        - userId
+
+    UserExtended:
+      type: object
+      properties:
+        userId:
+          type: string
+        attributes:
+          description: a mapping of user property names to a value
+          type: object
+          additionalProperties:
+            type: string
+        contractualRelationship:
+          $ref: '#/components/schemas/ContractualRelationship'
+        consents:
+          description: the accepted consents
+          $ref: '#/components/schemas/UserDiscretionaryConsents'
+      required:
+        - userId
+  
+    ChildInfo:
+      type: object
+      properties:
+        childId:
+          type: string
+        deniedThirdParties:
+          $ref: './config_schema.yml#/components/schemas/PlatformSharingParties'
+      required:
+        - childId
+
+    UserChildrenList:
+      type: object
+      properties:
+        guardianId:
+          type: string
+          description: the identifier of the guardian requesting their children
+        children:
+          type: array
+          description: the children of this guardian including any controls
+          items:
+            $ref: '#/components/schemas/ChildInfo'
+      required:
+        - guardianId
+
+    UserGuardianList:
+      type: object
+      properties:
+        childId:
+          type: string
+        guardians:
+          type: array
+          description: the identities of any subjects who are guardians
+          items:
+            type: string
+
+    UpsertGuardianInfo:
+      type: object
+      properties:
+        guardianId:
+          type: string
+        child:
+          $ref: '#/components/schemas/ChildInfo'
+      required:
+        - guardianId
+        - child
+
+    #
+    # Structures used by the Decision APIs
+    #
+
+    DecisionField:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+      required:
+        - name
+
+    DecisionQuery:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/DecisionField'
+        returnAllowedFields:
+          type: boolean
+      required:
+        - fields
+
+    DecisionResponse:
+      type: object
+      properties:
+        permitted:
+          type: boolean
+        message:
+          type: string
+        allowedFields:
+          type: array
+          items:
+            type: string
+      required:
+        - permitted
+        - message
+
+    #
+    # Structures used by the Redact APIs
+    #
+
+    RedactionReceipt:
+      type: object
+      properties:
+        jobName:
+          type: string
+          description: The name of the running redaction job
+        signature:
+          type: string
+          format: binary
+        signatureHexString:
+          type: string
+        error:
+          type: string
+      required:
+        - jobName
+
+    RedactionStats:
+      type: object
+      properties:
+        totalRecordsRead:
+          type: integer
+          description: a count of the total number of records read from the document
+        readErrors:
+          type: integer
+          description: the number of errors encountered while redacting the document
+        recordsDropped:
+          type: integer
+          description: the number of records dropped completely during redaction
+        recordsRedacted:
+          type: integer
+          description: the number of records that had one or more fields redacted, but remain in the resulting document
+        dropReasons:
+          type: object
+          description: a map of reason string to count of the number of records dropped due to that reason
+          additionalProperties:
+            type: string
+        redactReasons:
+          type: object
+          description: a map of reason string to count of the number of records redacted due to that reason
+          additionalProperties:
+            type: string
+        recordsWithoutCategories:
+          type: integer
+          description: count of the number of records that were dropped because none of its columns mapped to a category
+        unmappedFields:
+          type: array
+          items:
+            type: string
+          description: a list of all field names that were not defined in the mapping group
+        permitReasons:
+          type: object
+          description: a map of reason string to count of the number of records permitted in-full
+          additionalProperties:
+            type: string
+      required:
+        - totalRecordsRead
+
+    #
+    # Structures used by the Mapping APIs
+    #
+
+    FieldMapping:
+      type: object
+      properties:
+        recordField:
+          type: string
+          description: the identifier of the field in a format compatible with the underlying data provider
+        categoryId:
+          type: string
+          description: the stable identifier of the category that the record field maps to
+        fieldId:
+          type: string
+          description: the stable identifier of the field within the identified category that this record field maps to
+        resourceContext:
+          type: boolean
+          description: if true, this record field's value identifies the resource subject for the data
+        fieldMatchRules:
+          type: object
+          additionalProperties:
+            type: string
+          description: >
+            Specifies optional record-field matching constraints. If fieldMatchRules is empty, then the mapping is said to
+            match if any record-field in the input matches the value of recordField. If non-empty, then each key in fieldMatchRules
+            is interpreted as a record-field name. If a record has matching fields for every key, and if each value matches the
+            value of the corresponding field in fieldMatchRules, only then is this mapping's recordField checked for a match. Use
+            fieldMatchRules for situations where a required field has different names depending on other fields. For example in a
+            system with 'user' and 'customer' records a `type` field is used to distinguish between them. For user records the
+            user_id is in the field named `id` and the `type` field is "user". But for customer records, the user_id is in the field
+            named `cust_id` when the `type` field has the value "customer". To handle this case, two mappings would be defined. One
+            would have field match rules set to match `type` against "user" and the other would match `type` against "customer".
+
+    MappingGroup:
+      type: object
+      properties:
+        name:
+          type: string
+          description: the group's name
+        summary:
+          type: string
+          description: a short description of the purpose of the group
+        fullDescription:
+          type: string
+          description: a long free-text description
+        fieldMappings:
+          type: array
+          description: all the defined field mappings in this group
+          items:
+            $ref: '#/components/schemas/FieldMapping'
+        default:
+          type: boolean
+        
+    MappingGroups:
+      type: object
+      properties:
+        modelGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/MappingGroup'

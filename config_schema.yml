@@ -1,0 +1,401 @@
+components:
+
+  parameters:
+
+    MinorChangeQueryParameter:
+      name: minorChange
+      in: query
+      required: false
+      description: If true, treat this change as a minor change that will not require any user to accept the associated, new terms.
+      schema:
+        type: boolean
+
+  schemas:
+
+    Field:
+      type: object
+      properties:
+        name:
+          type: string
+          description: the name of the field
+        stableId:
+          type: string
+          description: the stableId is the immutable identity of the field, and remains the same even if the name changes. If omitted, the appliance will generate a stableId for you. If included, the appliance will use the stableId you provide.
+      required:
+        - name
+
+    Details:
+      type: object
+      properties:
+        summary:
+          type: string
+        fullDescription:
+          type: string
+
+    EntityWithDetails:
+      allOf:
+        - type: object
+          properties:
+            name:
+              type: string
+          required:
+            - name
+        - $ref: '#/components/schemas/Details'
+
+    Category:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+        - type: object
+          properties:
+            fields:
+              type: array
+              items: 
+                $ref: '#/components/schemas/Field'
+              description: a collection of named fields describing distinct instances and varieties of this category of data
+            stableId:
+              type: string
+              description: the stableId is the immutable identity of the category, and remains the same even if the name changes. If omitted, the appliance will generate a stableId for you. If included, the appliance will use the stableId you provide.
+          required:
+            - fields
+
+    Categories:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+      required:
+        - categories
+
+    CategoryIdentifiers:
+      type: array
+      items:
+        type: string
+
+    AbstractPurpose:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+
+    PurposeNames:
+      type: array
+      items:
+        type: string
+
+    PlatformOverride:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+        - type: object
+          properties:
+            propertyName:
+              type: string
+              enum:
+                - dob
+                - location
+              description: The name of a user property
+            values:
+              type: array
+              items:
+                type: string
+            allowedPurposes:
+              $ref: '#/components/schemas/PurposeNames'
+          required:
+            - propertyName
+            - values
+
+    PlatformUsePurpose:
+      allOf:
+        - $ref: '#/components/schemas/AbstractPurpose'
+        - type: object
+          properties:
+            categories:
+              description: the set of categories that are valid for this platform use purpose
+              $ref: '#/components/schemas/CategoryIdentifiers'
+            optIn:
+              type: boolean
+              description: true if this platform use purpose is only enabled by user opt-in
+              default: false
+          required:
+            - categories
+
+    PlatformUsePurposes:
+      type: object
+      properties:
+        purposes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlatformUsePurpose'
+      required:
+        - purposes
+
+    PlatformUseOverrides:
+      type: object
+      properties:
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlatformOverride'
+      required:
+        - overrides
+
+    ThirdParty:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+        - type: object
+          properties:
+            categories:
+              description: The set of categories allowed for sharing with this party, or empty to use the purpose ceiling
+              $ref: '#/components/schemas/CategoryIdentifiers'
+            serviceProvider:
+              type: boolean
+              default: false
+          required:
+            - name
+
+    PlatformSharingPurpose:
+      allOf:
+        - $ref: '#/components/schemas/AbstractPurpose'
+        - type: object
+          properties:
+            categoryCeiling:
+              description: the upper-bound of categories available for this platform sharing purpose
+              $ref: '#/components/schemas/CategoryIdentifiers'
+            thirdParties:
+              description: all the individual third parties that may receive shared data through this purpose
+              type: array
+              items:
+                $ref: '#/components/schemas/ThirdParty'
+          required:
+            - categoryCeiling
+            - thirdParties
+
+    PlatformSharingPurposes:
+      type: object
+      properties:
+        purposes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlatformSharingPurpose'
+      required:
+        - purposes
+
+    PlatformSharingOverrides:
+      type: object
+      properties:
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlatformOverride'
+      required:
+        - overrides
+
+    ConsentTerms:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+        - type: object
+          properties:
+            requestedCategories:
+              description: the set of categories requested under these consent terms
+              $ref: '#/components/schemas/CategoryIdentifiers'
+
+    ConsentedSharingPurpose:
+      allOf:
+        - $ref: '#/components/schemas/AbstractPurpose'
+        - type: object
+          properties:
+            terms:
+              description: all the individual parties that may receive shared data through this purpose
+              type: array
+              items:
+                $ref: '#/components/schemas/ConsentTerms'
+          required:
+            - terms
+
+    ConsentedSharingPurposes:
+      type: object
+      properties:
+        purposes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConsentedSharingPurpose'
+      required:
+        - purposes
+
+    ContractTerms:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+        - type: object
+          properties:
+            contractAccess:
+              description: the set of categories that may be shared under the contract terms
+              $ref: '#/components/schemas/CategoryIdentifiers'
+            userAccess:
+              description: the set of categories that a user is allowed under contract terms
+              $ref: '#/components/schemas/CategoryIdentifiers'
+            platformUsePurposes:
+              description: the set of Platform Use Purposes that are allowed under contract terms
+              $ref: '#/components/schemas/PurposeNames'
+            platformSharingPurposes:
+              description: the set of Platform Sharing Purposes that are allowed under contract terms
+              $ref: '#/components/schemas/PurposeNames'
+
+    ContractualExchangePurpose:
+      allOf:
+        - $ref: '#/components/schemas/AbstractPurpose'
+        - type: object
+          properties:
+            terms:
+              description: all the contractual terms that allow exchange under some named purpose
+              type: array
+              items:
+                $ref: '#/components/schemas/ContractTerms'
+          required:
+            - terms
+
+    ContractualExchangePurposes:
+      type: object
+      properties:
+        purposes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContractualExchangePurpose'
+      required:
+        - purposes
+
+    UserAccess:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+        - type: object
+          properties:
+            categories:
+              $ref: '#/components/schemas/CategoryIdentifiers'
+          required:
+            - categories
+
+    UserOverride:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+        - type: object
+          properties:
+            propertyName:
+              type: string
+              enum:
+                - dob
+                - location
+              description: The name of a user property
+            values:
+              type: array
+              items:
+                type: string
+            allowedCategories:
+              $ref: '#/components/schemas/CategoryIdentifiers'
+          required:
+            - propertyName
+            - values
+
+    UserAccessOverrides:
+      type: object
+      properties:
+        overrides:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserOverride'
+      required:
+        - overrides
+
+    PlatformSharingParties:
+      type: array
+      items:
+        type: object
+        title: PurposeWithParties
+        properties:
+          purposeName:
+            type: string
+          thirdParties:
+            type: array
+            items:
+              type: string
+
+    GuardianAccess:
+      allOf:
+        - $ref: '#/components/schemas/EntityWithDetails'
+        - type: object
+          properties:
+            thresholdAge:
+              type: integer
+            categories:
+              $ref: '#/components/schemas/CategoryIdentifiers'
+            allowedToDisable:
+              $ref: '#/components/schemas/PlatformSharingParties'
+          required:
+            - thresholdAge
+            - categories
+
+    ChangedTermsDefaultBehavior:
+      type: object
+      properties:
+        defaultBehavior:
+          type: string
+          enum:
+            - silent
+            - notify
+            - acquire
+
+    FullPlatformUse:
+      type: object
+      properties:
+        purposes:
+          ref: '#/components/schemas/PlatformUsePurposes'
+        overrides:
+          ref: '#/components/schemas/PlatformUseOverrides'
+      required:
+        - purposes
+
+    FullPlatformSharing:
+      type: object
+      properties:
+        purposes:
+          ref: '#/components/schemas/PlatformSharingPurposes'
+        overrides:
+          ref: '#/components/schemas/PlatformSharingOverrides'
+      required:
+        - purposes
+
+    FullUserAccess:
+      type: object
+      properties:
+        user:
+          ref: '#/components/schemas/UserAccess'
+        guardians:
+          ref: '#/components/schemas/GuardianAccess'
+        overrides:
+          ref: '#/components/schemas/UserAccessOverrides'
+      required:
+        - user
+
+    FullConfiguration:
+      type: object
+      properties:
+        categories:
+          $ref: '#/components/schemas/Categories'
+        platformUse:
+          $ref: '#/components/schemas/FullPlatformUse'
+        platformSharing:
+          $ref: '#/components/schemas/FullPlatformSharing'
+        userAccess:
+          $ref: '#/components/schemas/FullUserAccess'
+        contractualExchange:
+          $ref: '#/components/schemas/ContractualExchangePurposes'
+        consentedSharing:
+          $ref: '#/components/schemas/ConsentedSharingPurposes'
+        termsBehavior:
+          $ref: '#/components/schemas/ChangedTermsDefaultBehavior'
+      required:
+        - categories
+        - platformUse
+        - platformSharing
+        - userAccess
+        - contractualExchange
+        - consentedSharing
+        - termsBehavior
+
