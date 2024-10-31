@@ -217,8 +217,8 @@ paths:
                 optIns:
                   - 'Marketing Email'
                 affirmativeConsents:
-                  - purpose: 'Train Algorithm'
-                    terms: 'AI startup3'
+                  - purposeId: 'TrainAlgorithm'
+                    termsId: 'AIstartup3'
                     categories:
                       - email
                       - address
@@ -721,6 +721,8 @@ paths:
           description: OK
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
+        '409':
+          description: the request included a new category or field with a non-unique stable identifier
         '500':
           description: an internal error occurred, any error message will be in the response body
 
@@ -847,6 +849,8 @@ paths:
           description: OK
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
+        '409':
+          description: the request included a new purpose with a non-unique stable identifier
         '500':
           description: an internal error occurred, any error message will be in the response body
 
@@ -895,6 +899,8 @@ paths:
           description: OK
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
+        '409':
+          description: the request included a new purpose or third-party with a non-unique stable identifier
         '500':
           description: an internal error occurred, any error message will be in the response body
   
@@ -943,6 +949,8 @@ paths:
           description: OK
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
+        '409':
+          description: the request included a new purpose or terms with a non-unique stable identifier
         '500':
           description: an internal error occurred, any error message will be in the response body
   
@@ -995,6 +1003,8 @@ paths:
           description: OK
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
+        '409':
+          description: the request included a new purpose or terms with a non-unique stable identifier
         '500':
           description: an internal error occurred, any error message will be in the response body
   

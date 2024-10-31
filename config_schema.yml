@@ -17,7 +17,11 @@ components:
       properties:
         stableId:
           type: string
-          description: An immutable identity that is stable even as associated human-readable names change.
+          description: |
+            An immutable identity that is stable even as associated human-readable names change. This identity must be
+            globally unique, so that any given entity (e.g., a Category or a Purpose) can be uniquly identified.
+      required:
+        - stableId
 
     Field:
       allOf:
