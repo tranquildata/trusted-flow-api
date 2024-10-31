@@ -3,7 +3,7 @@
 # Note that this definition uses two patterns that OpenAPI generators ignore by default:
 #  1. alias to array
 #  2. form models
-# As such, to generate full documentatin or code from this specification you must set
+# As such, to generate full documentation or code from this specification you must set
 # "generateAliasAsModel" to true and "skipFormModel" to false. For instance, when using the
 # generator CLI you should specify:
 #   $ openapi-generator generate -i [file.yml] --generate-alias-as-model --global-property "skipFormModel=false" -g [...]
@@ -457,13 +457,13 @@ paths:
             type: string
           required: false
         - in: query
-          name: contractualPurpose
+          name: contractualPurposeId
           description: the purpose of a contractual relationship, which requires a value for `contractualTerms`
           schema:
             type: string
           required: false
         - in: query
-          name: contractualTerms
+          name: contractualTermsId
           description: the terms of a contractual relationship, which requires a value for `contractualPurpose`
           schema:
             type: string
@@ -811,11 +811,11 @@ paths:
       operationId: getPlatormUses
       parameters:
         - in: query
-          name: purposeName
+          name: purposeId
           schema:
             type: string
           required: false
-          description: if present, only the named purpose will be returned
+          description: if present, only the identified purpose will be returned
       responses:
         '200':
           description: OK
@@ -824,7 +824,7 @@ paths:
               schema:
                 $ref: './config_schema.yml#/components/schemas/PlatformUsePurposes'
         '404':
-          description: A purposeName was present, but the identified platform use purpose is unknown.
+          description: A purposeId was present, but the identified platform use purpose is unknown.
         '500':
           description: An internal error occured trying to retrieve the requested platform use purpose.
 
@@ -859,11 +859,11 @@ paths:
       operationId: getPlatormSharing
       parameters:
         - in: query
-          name: purposeName
+          name: purposeId
           schema:
             type: string
           required: false
-          description: if present, only the named purpose will be returned
+          description: if present, only the identified purpose will be returned
       responses:
         '200':
           description: OK
@@ -872,7 +872,7 @@ paths:
               schema:
                 $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
         '404':
-          description: A purposeName was present, but the identified platform sharing purpose is unknown.
+          description: A purposeId was present, but the identified platform sharing purpose is unknown.
         '500':
           description: An internal error occured trying to retrieve the requested platform sharing purpose.
 
@@ -907,11 +907,11 @@ paths:
       operationId: getConsentedSharing
       parameters:
         - in: query
-          name: purposeName
+          name: purposeId
           schema:
             type: string
           required: false
-          description: if present, only the named purpose will be returned
+          description: if present, only the identified purpose will be returned
       responses:
         '200':
           description: OK
@@ -920,7 +920,7 @@ paths:
               schema:
                 $ref: './config_schema.yml#/components/schemas/ConsentedSharingPurposes'
         '404':
-          description: A purposeName was present, but the identified consented sharing purpose is unknown.
+          description: A purposeId was present, but the identified consented sharing purpose is unknown.
         '500':
           description: An internal error occured trying to retrieve the requested consented sharing purpose.
 
@@ -932,7 +932,7 @@ paths:
       parameters:
         - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
       requestBody:
-        description: the third party groups
+        description: the third party purposes
         required: true
         content:
           application/json:
@@ -955,11 +955,11 @@ paths:
       operationId: getContractualExchange
       parameters:
         - in: query
-          name: purposeName
+          name: purposeId
           schema:
             type: string
           required: false
-          description: if present, only the named purpose will be returned
+          description: if present, only the identified purpose will be returned
       responses:
         '200':
           description: OK
@@ -968,7 +968,7 @@ paths:
               schema:
                 $ref: './config_schema.yml#/components/schemas/ContractualExchangePurposes'
         '404':
-          description: A purpose was present but is unknown.
+          description: A purposeId was present, but the identified contractual exchange purpose is unknown.
         '500':
           description: An internal error occured trying to retrieve the requested contractual exchange purpose.
 
@@ -1286,15 +1286,12 @@ components:
     #
 
     PurposeQueryParameter:
-      name: purpose
+      name: purposeId
       in: query
       required: false
       description: |
         The purpose of the request. No purpose is required for the `userAccess` request type. For all other request
-        types a valid purpose is required.
-
-        For `platformUse` and `platfromSharing` the purpose must be one of the purposes named in configuration. For
-        `contractualExchange` and `consentedSharing` the purpose must be one of the groups named in configuration. 
+        types, a valid purpose identified in the given type is required.
       schema:
         type: string
 
@@ -1327,9 +1324,10 @@ components:
         The requestor who is asserting the given purpose for the given type of request. No subject is required for
         the `platformUse` type. For all other request types a valid subject is required.
 
-        For `platformSharing` the subject must be one of the third parties from the stated purpose. For `userAccess` the
-        subject must be a user provisioned via [upsertUser()](#api-User-upsertUser). For `contractualExchange` and
-        `consentedSharing` the subject must part of the identified purpose group.
+        For `platformSharing` the subject must be the identifier for one of the third parties supporting the stated
+        purpose. For `userAccess` the subject must be a user provisioned via [upsertUser()](#api-User-upsertUser).
+        For `contractualExchange` and `consentedSharing` the subject must identify a specific set of terms from
+        the identified purpose.
       schema:
         type: string
 
@@ -1366,10 +1364,10 @@ components:
     ContractualRelationship:
       type: object
       properties:
-        purpose:
+        purposeId:
           type: string
           description: the purpose of the contractual relationship
-        terms:
+        termsId:
           type: string
           description: the terms of the contractual relationship
       required:
@@ -1417,10 +1415,10 @@ components:
     AffirmativeConsentRelationship:
       type: object
       properties:
-        purpose:
+        purposeId:
           type: string
           description: the purpose of the consented sharing
-        terms:
+        termsId:
           type: string
           description: the terms describing this consented sharing
         categories:
@@ -1459,7 +1457,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PersonalSharingRelationship'
-        optIns:
+        optInIds:
           type: array
           description: a list of all the opt-in purposes the user consented to
           items:

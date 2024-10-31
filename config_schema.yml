@@ -12,17 +12,23 @@ components:
 
   schemas:
 
-    Field:
+    ReferencedEntity:
       type: object
       properties:
-        name:
-          type: string
-          description: the name of the field
         stableId:
           type: string
-          description: the stableId is the immutable identity of the field, and remains the same even if the name changes. If omitted, the appliance will generate a stableId for you. If included, the appliance will use the stableId you provide.
-      required:
-        - name
+          description: An immutable identity that is stable even as associated human-readable names change.
+
+    Field:
+      allOf:
+        - $ref: '#/components/schemas/ReferencedEntity'
+        - type: object
+          properties:
+            name:
+              type: string
+              description: the name of the field
+          required:
+            - name
 
     Details:
       type: object
@@ -45,16 +51,14 @@ components:
     Category:
       allOf:
         - $ref: '#/components/schemas/EntityWithDetails'
+        - $ref: '#/components/schemas/ReferencedEntity'
         - type: object
           properties:
             fields:
               type: array
-              items: 
+              items:
                 $ref: '#/components/schemas/Field'
               description: a collection of named fields describing distinct instances and varieties of this category of data
-            stableId:
-              type: string
-              description: the stableId is the immutable identity of the category, and remains the same even if the name changes. If omitted, the appliance will generate a stableId for you. If included, the appliance will use the stableId you provide.
           required:
             - fields
 
@@ -76,8 +80,9 @@ components:
     AbstractPurpose:
       allOf:
         - $ref: '#/components/schemas/EntityWithDetails'
+        - $ref: '#/components/schemas/ReferencedEntity'
 
-    PurposeNames:
+    PurposeIdentifiers:
       type: array
       items:
         type: string
@@ -98,7 +103,7 @@ components:
               items:
                 type: string
             allowedPurposes:
-              $ref: '#/components/schemas/PurposeNames'
+              $ref: '#/components/schemas/PurposeIdentifiers'
           required:
             - propertyName
             - values
@@ -141,6 +146,7 @@ components:
     ThirdParty:
       allOf:
         - $ref: '#/components/schemas/EntityWithDetails'
+        - $ref: '#/components/schemas/ReferencedEntity'
         - type: object
           properties:
             categories:
@@ -192,6 +198,7 @@ components:
     ConsentTerms:
       allOf:
         - $ref: '#/components/schemas/EntityWithDetails'
+        - $ref: '#/components/schemas/ReferencedEntity'
         - type: object
           properties:
             requestedCategories:
@@ -224,6 +231,7 @@ components:
     ContractTerms:
       allOf:
         - $ref: '#/components/schemas/EntityWithDetails'
+        - $ref: '#/components/schemas/ReferencedEntity'
         - type: object
           properties:
             contractAccess:
@@ -232,12 +240,12 @@ components:
             userAccess:
               description: the set of categories that a user is allowed under contract terms
               $ref: '#/components/schemas/CategoryIdentifiers'
-            platformUsePurposes:
+            platformUsePurposeIds:
               description: the set of Platform Use Purposes that are allowed under contract terms
-              $ref: '#/components/schemas/PurposeNames'
-            platformSharingPurposes:
+              $ref: '#/components/schemas/PurposeIdentifiers'
+            platformSharingPurposeIds:
               description: the set of Platform Sharing Purposes that are allowed under contract terms
-              $ref: '#/components/schemas/PurposeNames'
+              $ref: '#/components/schemas/PurposeIdentifiers'
 
     ContractualExchangePurpose:
       allOf:
@@ -264,7 +272,7 @@ components:
 
     UserAccess:
       allOf:
-        - $ref: '#/components/schemas/EntityWithDetails'
+        - $ref: '#/components/schemas/Details'
         - type: object
           properties:
             categories:
@@ -309,16 +317,16 @@ components:
         type: object
         title: PurposeWithParties
         properties:
-          purposeName:
+          purposeId:
             type: string
-          thirdParties:
+          thirdPartyIds:
             type: array
             items:
               type: string
 
     GuardianAccess:
       allOf:
-        - $ref: '#/components/schemas/EntityWithDetails'
+        - $ref: '#/components/schemas/Details'
         - type: object
           properties:
             thresholdAge:
