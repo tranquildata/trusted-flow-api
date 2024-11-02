@@ -219,7 +219,7 @@ paths:
                 affirmativeConsents:
                   - purposeId: 'TrainAlgorithm'
                     termsId: 'AIstartup3'
-                    categories:
+                    categoryIds:
                       - email
                       - address
       responses:
@@ -1400,11 +1400,11 @@ components:
             - $ref: '#/components/schemas/ContractualRelationship'
             - type: object
               properties:
-                categories:
+                categoryIds:
                   description: the categories of data associated with the user shared with the contractual entity
                   $ref: './config_schema.yml#/components/schemas/CategoryIdentifiers'
               required:
-                - categories
+                - categoryIds
           title: ContractualCategories
       required:
         - categories
@@ -1431,11 +1431,9 @@ components:
         termsId:
           type: string
           description: the terms describing this consented sharing
-        categories:
-          type: array
+        categoryIds:
           description: the set of categories that a user consents to share through this relationship
-          items:
-            type: string
+          $ref: './config_schema.yml#/components/schemas/CategoryIdentifiers'
       required:
         - consentedParty
         - purpose
@@ -1446,11 +1444,9 @@ components:
         userId:
           type: string
           description: the identity of a user who is allowed shared data through this relationship
-        categories:
-          type: array
+        categoryIds:
           description: the set of categories that a user consents to share through this relationship
-          items:
-            type: string
+          $ref: './config_schema.yml#/components/schemas/CategoryIdentifiers'
       required:
         - userId
 

@@ -117,7 +117,7 @@ components:
         - $ref: '#/components/schemas/AbstractPurpose'
         - type: object
           properties:
-            categories:
+            categoryIds:
               description: the set of categories that are valid for this platform use purpose
               $ref: '#/components/schemas/CategoryIdentifiers'
             optIn:
@@ -125,7 +125,7 @@ components:
               description: true if this platform use purpose is only enabled by user opt-in
               default: false
           required:
-            - categories
+            - categoryIds
 
     PlatformUsePurposes:
       type: object
@@ -153,21 +153,19 @@ components:
         - $ref: '#/components/schemas/ReferencedEntity'
         - type: object
           properties:
-            categories:
+            categoryIds:
               description: The set of categories allowed for sharing with this party, or empty to use the purpose ceiling
               $ref: '#/components/schemas/CategoryIdentifiers'
             serviceProvider:
               type: boolean
               default: false
-          required:
-            - name
 
     PlatformSharingPurpose:
       allOf:
         - $ref: '#/components/schemas/AbstractPurpose'
         - type: object
           properties:
-            categoryCeiling:
+            categoryCeilingIds:
               description: the upper-bound of categories available for this platform sharing purpose
               $ref: '#/components/schemas/CategoryIdentifiers'
             thirdParties:
@@ -176,7 +174,7 @@ components:
               items:
                 $ref: '#/components/schemas/ThirdParty'
           required:
-            - categoryCeiling
+            - categoryCeilingIds
             - thirdParties
 
     PlatformSharingPurposes:
@@ -205,7 +203,7 @@ components:
         - $ref: '#/components/schemas/ReferencedEntity'
         - type: object
           properties:
-            requestedCategories:
+            requestedCategoryIds:
               description: the set of categories requested under these consent terms
               $ref: '#/components/schemas/CategoryIdentifiers'
 
@@ -238,10 +236,10 @@ components:
         - $ref: '#/components/schemas/ReferencedEntity'
         - type: object
           properties:
-            contractAccess:
+            contractAccessCategoryIds:
               description: the set of categories that may be shared under the contract terms
               $ref: '#/components/schemas/CategoryIdentifiers'
-            userAccess:
+            userAccessCategoryIds:
               description: the set of categories that a user is allowed under contract terms
               $ref: '#/components/schemas/CategoryIdentifiers'
             platformUsePurposeIds:
@@ -279,7 +277,7 @@ components:
         - $ref: '#/components/schemas/Details'
         - type: object
           properties:
-            categories:
+            categoryIds:
               $ref: '#/components/schemas/CategoryIdentifiers'
           required:
             - categories
@@ -299,7 +297,7 @@ components:
               type: array
               items:
                 type: string
-            allowedCategories:
+            allowedCategoryIds:
               $ref: '#/components/schemas/CategoryIdentifiers'
           required:
             - propertyName
@@ -335,13 +333,13 @@ components:
           properties:
             thresholdAge:
               type: integer
-            categories:
+            categoryIds:
               $ref: '#/components/schemas/CategoryIdentifiers'
             allowedToDisable:
               $ref: '#/components/schemas/PlatformSharingParties'
           required:
             - thresholdAge
-            - categories
+            - categoryIds
 
     ChangedTermsDefaultBehavior:
       type: object
