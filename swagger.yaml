@@ -900,7 +900,7 @@ paths:
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
         '404':
-          description: A Platform Use Purpose was idenified, but the purpose is unknown
+          description: A Platform Use Purpose was identified, but the purpose is unknown
         '409':
           description: |
             the request included a new purpose or third-party with a non-unique stable identifier, or connected a purpose
