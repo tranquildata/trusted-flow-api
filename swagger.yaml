@@ -899,8 +899,12 @@ paths:
           description: OK
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
+        '404':
+          description: A Platform Use Purpose was idenified, but the purpose is unknown
         '409':
-          description: the request included a new purpose or third-party with a non-unique stable identifier
+          description: |
+            the request included a new purpose or third-party with a non-unique stable identifier, or connected a purpose
+            to a Platform Use Purpose and attembed to expand the allowed categories
         '500':
           description: an internal error occurred, any error message will be in the response body
   
