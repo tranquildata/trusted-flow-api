@@ -106,7 +106,7 @@ components:
               type: array
               items:
                 type: string
-            allowedPurposes:
+            allowedPurposeIds:
               $ref: '#/components/schemas/PurposeIdentifiers'
           required:
             - propertyName
@@ -173,6 +173,9 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ThirdParty'
+            platformUsePurposeId:
+              description: If this Platfrom Sharing Purpose is in-support of a Platfrom Use Purpose then that use is identified here.
+              type: string
           required:
             - categoryCeilingIds
             - thirdParties
@@ -280,7 +283,7 @@ components:
             categoryIds:
               $ref: '#/components/schemas/CategoryIdentifiers'
           required:
-            - categories
+            - categoryIds
 
     UserOverride:
       allOf:
