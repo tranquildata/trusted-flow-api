@@ -573,6 +573,32 @@ paths:
 
   /redact/document:
 
+    get:
+      tags:
+        - redact
+      summary: Returns the redacted document, when it's available.
+      operationId: getRedactedDocument
+      parameters:
+        - name: jobName
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The unique redaction job name for this document.
+      responses:
+        '200':
+          description: The full, redacted, document.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+        '400':
+          description: The redaction job name was missing from the request, or the job name is unknown.
+        '404':
+          description: The job is still running. 
+        '500':
+          description: There was an internal error reading or loading the filtered document, or the job failed.
+
     put:
       tags:
         - redact
@@ -618,32 +644,6 @@ paths:
         '500':
           description: There was an internal error attempting to schedule redaction
 
-    get:
-      tags:
-        - redact
-      summary: Returns the redacted document, when it's available.
-      operationId: getRedactedDocument
-      parameters:
-        - name: jobName
-          in: query
-          required: true
-          schema:
-            type: string
-          description: The unique redaction job name for this document.
-      responses:
-        '200':
-          description: The full, redacted, document.
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-        '400':
-          description: The redaction job name was missing from the request, or the job name is unknown.
-        '404':
-          description: The job is still running. 
-        '500':
-          description: There was an internal error reading or loading the filtered document, or the job failed.
-
   /redact/stats:
 
     get:
@@ -675,6 +675,43 @@ paths:
   #
   # Config API paths
   #
+
+  /config:
+
+    get:
+      tags:
+        - config
+      summary: returns the entire configuration
+      operationId: getFullConfig
+      responses:
+        '200':
+          description: request was successful, summaries are in the response body
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/FullConfiguration'
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+    put:
+      tags:
+        - config
+      summary: create the entire configuration. The full existing configuration will be replaced with the input configuration.
+      operationId: createFullConfig
+      requestBody:
+        description: the entire configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/FullConfiguration'
+      responses:
+        '200':
+          description: configuration was successful
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
 
   /config/categories:
 
@@ -726,188 +763,6 @@ paths:
         '500':
           description: an internal error occurred, any error message will be in the response body
 
-  /config/user-access:
-
-    get:
-      tags:
-        - config
-      summary: Returns the configured user access rights.
-      operationId: getUserAccess
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: './config_schema.yml#/components/schemas/UserAccess'
-        '500':
-          description: An internal error occured trying to retrieve the user access rights.
-
-    put:
-      tags:
-        - config
-      summary: create or replace default user access rules. The default user access configuration is replaced with the request body content.
-      operationId: replaceUserAccess
-      parameters:
-        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
-      requestBody:
-        description: the user access rules
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './config_schema.yml#/components/schemas/UserAccess'
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: error reading or parsing the request body, any error message will be in the response body
-        '500':
-          description: an internal error occurred, any error message will be in the response body
-
-  /config/user-access/guardian:
-
-    get:
-      tags:
-        - config
-      summary: Returns the configured guardian user access rules.
-      operationId: getGuardianAccess
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: './config_schema.yml#/components/schemas/GuardianAccess'
-        '500':
-          description: An internal error occured trying to retrieve the user access rights.
-
-    put:
-      tags:
-        - config
-      summary: configure guardian user access rules. Replaces the configured rules with the input request body.
-      operationId: replaceGuardianAccess
-      parameters:
-        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
-      requestBody:
-        description: the access rules for guardians of users who are children
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './config_schema.yml#/components/schemas/GuardianAccess'
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: error reading or parsing the request body, any error message will be in the response body
-        '500':
-          description: an internal error occurred, any error message will be in the response body
-
-  /config/platform-use:
-
-    get:
-      tags:
-        - config
-      summary: Returns one or all configured platform use purposes.
-      operationId: getPlatormUses
-      parameters:
-        - in: query
-          name: purposeId
-          schema:
-            type: string
-          required: false
-          description: if present, only the identified purpose will be returned
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: './config_schema.yml#/components/schemas/PlatformUsePurposes'
-        '404':
-          description: A purposeId was present, but the identified platform use purpose is unknown.
-        '500':
-          description: An internal error occured trying to retrieve the requested platform use purpose.
-
-    put:
-      tags:
-        - config
-      summary: Creates or replaces platform uses. Replaces the configured platform uses with the input request body.
-      operationId: replacePlatformUses
-      parameters:
-        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
-      requestBody:
-        description: the platform use purposes
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './config_schema.yml#/components/schemas/PlatformUsePurposes'
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: error reading or parsing the request body, any error message will be in the response body
-        '409':
-          description: the request included a new purpose with a non-unique stable identifier
-        '500':
-          description: an internal error occurred, any error message will be in the response body
-
-  /config/platform-sharing:
-
-    get:
-      tags:
-        - config
-      summary: Returns one or all configured platform sharing purposes.
-      operationId: getPlatormSharing
-      parameters:
-        - in: query
-          name: purposeId
-          schema:
-            type: string
-          required: false
-          description: if present, only the identified purpose will be returned
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
-        '404':
-          description: A purposeId was present, but the identified platform sharing purpose is unknown.
-        '500':
-          description: An internal error occured trying to retrieve the requested platform sharing purpose.
-
-    put:
-      tags:
-        - config
-      summary: Replace third party groups configuration. Replaces the configuration of platform sharing purposes with the request body.
-      operationId: replacePlatformSharing
-      parameters:
-        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
-      requestBody:
-        description: The set of platform sharing purposes to configure
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: error reading or parsing the request body, any error message will be in the response body
-        '404':
-          description: A Platform Use Purpose was identified, but the purpose is unknown
-        '409':
-          description: |
-            the request included a new purpose or third-party with a non-unique stable identifier, or connected a purpose
-            to a Platform Use Purpose and attembed to expand the allowed categories
-        '500':
-          description: an internal error occurred, any error message will be in the response body
-  
   /config/consented-sharing:
 
     get:
@@ -1011,154 +866,58 @@ paths:
           description: the request included a new purpose or terms with a non-unique stable identifier
         '500':
           description: an internal error occurred, any error message will be in the response body
-  
-  /config/reconsent-default:
 
-    put:
-      tags:
-        - config
-      summary: The defined behavior is replaced with the input behavior.
-      operationId: configureReconsent
-      requestBody:
-        description: the reconsent configuration
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './config_schema.yml#/components/schemas/ChangedTermsDefaultBehavior'
-      responses:
-        '200':
-          description: configuration was successful
-        '400':
-          description: error reading or parsing the request body, any error message will be in the response body
-        '500':
-          description: an internal error occurred, any error message will be in the response body
-
-  /config/platform-sharing/overrides:
-
-    put:
-      tags:
-        - config
-      summary: The override definitions for platform sharing will be replaced with the request body configuration.
-      operationId: replacePlatformSharingOverrides
-      parameters:
-        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
-      requestBody:
-        description: the override configuration
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './config_schema.yml#/components/schemas/PlatformSharingOverrides'
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: error reading or parsing the request body, any error message will be in the response body
-        '404':
-          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
-        '500':
-          description: an internal error occurred, any error message will be in the response body
+  /config/platform-use:
 
     get:
       tags:
         - config
-      summary: get one or all of the platform sharing overrides
-      operationId: getPlatformSharingOverrides
+      summary: Returns one or all configured platform use purposes.
+      operationId: getPlatormUses
       parameters:
         - in: query
-          name: overrideName
+          name: purposeId
           schema:
             type: string
           required: false
-          description: if present, only the named override will be returned
+          description: if present, only the identified purpose will be returned
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: './config_schema.yml#/components/schemas/PlatformSharingOverrides'
+                $ref: './config_schema.yml#/components/schemas/PlatformUsePurposes'
         '404':
-          description: An overrideName was present, but the identified override is unknown.
+          description: A purposeId was present, but the identified platform use purpose is unknown.
         '500':
-          description: an internal error occurred, any error message will be in the response body
-
-  /config/user-access/overrides:
+          description: An internal error occured trying to retrieve the requested platform use purpose.
 
     put:
       tags:
         - config
-      summary: The definition of user access overrides will be replaced by the request body configuration.
-      operationId: replaceUserAccessOverrides
+      summary: Creates or replaces platform uses. Replaces the configured platform uses with the input request body.
+      operationId: replacePlatformUses
       parameters:
         - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
       requestBody:
-        description: the override configuration
+        description: the platform use purposes
         required: true
         content:
           application/json:
             schema:
-              $ref: './config_schema.yml#/components/schemas/UserAccessOverrides'
+              $ref: './config_schema.yml#/components/schemas/PlatformUsePurposes'
       responses:
         '200':
           description: OK
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
-        '404':
-          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
-        '500':
-          description: an internal error occurred, any error message will be in the response body
-
-    get:
-      tags:
-        - config
-      summary: get one or all of the user access overrides
-      operationId: getUserAccessOverrides
-      parameters:
-        - in: query
-          name: overrideName
-          schema:
-            type: string
-          required: false
-          description: if present, only the named override will be returned
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: './config_schema.yml#/components/schemas/UserAccessOverrides'
-        '404':
-          description: An overrideName was present, but the identified override is unknown.
+        '409':
+          description: the request included a new purpose with a non-unique stable identifier
         '500':
           description: an internal error occurred, any error message will be in the response body
 
   /config/platform-use/overrides:
-
-    put:
-      tags:
-        - config
-      summary: configure platform use overrides. The platform use override definition will be replaced by the input request body configuration.
-      operationId: replacePlatformUseOverrides
-      parameters:
-        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
-      requestBody:
-        description: the override configuration
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: './config_schema.yml#/components/schemas/PlatformUseOverrides'
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: error reading or parsing the request body, any error message will be in the response body
-        '404':
-          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
-        '500':
-          description: an internal error occurred, any error message will be in the response body
 
     get:
       tags:
@@ -1184,40 +943,281 @@ paths:
         '500':
           description: an internal error occurred, any error message will be in the response body
 
-  /config:
+    put:
+      tags:
+        - config
+      summary: configure platform use overrides. The platform use override definition will be replaced by the input request body configuration.
+      operationId: replacePlatformUseOverrides
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the override configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/PlatformUseOverrides'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '404':
+          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/platform-sharing:
 
     get:
       tags:
         - config
-      summary: returns the entire configuration
-      operationId: getFullConfig
+      summary: Returns one or all configured platform sharing purposes.
+      operationId: getPlatormSharing
+      parameters:
+        - in: query
+          name: purposeId
+          schema:
+            type: string
+          required: false
+          description: if present, only the identified purpose will be returned
       responses:
         '200':
-          description: request was successful, summaries are in the response body
+          description: OK
           content:
             application/json:
               schema:
-                $ref: './config_schema.yml#/components/schemas/FullConfiguration'
+                $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
+        '404':
+          description: A purposeId was present, but the identified platform sharing purpose is unknown.
+        '500':
+          description: An internal error occured trying to retrieve the requested platform sharing purpose.
+
+    put:
+      tags:
+        - config
+      summary: Replace third party groups configuration. Replaces the configuration of platform sharing purposes with the request body.
+      operationId: replacePlatformSharing
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: The set of platform sharing purposes to configure
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '404':
+          description: A Platform Use Purpose was identified, but the purpose is unknown
+        '409':
+          description: |
+            the request included a new purpose or third-party with a non-unique stable identifier, or connected a purpose
+            to a Platform Use Purpose and attembed to expand the allowed categories
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/platform-sharing/overrides:
+
+    get:
+      tags:
+        - config
+      summary: get one or all of the platform sharing overrides
+      operationId: getPlatformSharingOverrides
+      parameters:
+        - in: query
+          name: overrideName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named override will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/PlatformSharingOverrides'
+        '404':
+          description: An overrideName was present, but the identified override is unknown.
         '500':
           description: an internal error occurred, any error message will be in the response body
 
     put:
       tags:
         - config
-      summary: create the entire configuration. The full existing configuration will be replaced with the input configuration.
-      operationId: createFullConfig
+      summary: The override definitions for platform sharing will be replaced with the request body configuration.
+      operationId: replacePlatformSharingOverrides
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
       requestBody:
-        description: the entire configuration
+        description: the override configuration
         required: true
         content:
           application/json:
             schema:
-              $ref: './config_schema.yml#/components/schemas/FullConfiguration'
+              $ref: './config_schema.yml#/components/schemas/PlatformSharingOverrides'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '404':
+          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/reconsent-default:
+
+    put:
+      tags:
+        - config
+      summary: The defined behavior is replaced with the input behavior.
+      operationId: configureReconsent
+      requestBody:
+        description: the reconsent configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/ChangedTermsDefaultBehavior'
       responses:
         '200':
           description: configuration was successful
         '400':
           description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/user-access:
+
+    get:
+      tags:
+        - config
+      summary: Returns the configured user access rights.
+      operationId: getUserAccess
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/UserAccess'
+        '500':
+          description: An internal error occured trying to retrieve the user access rights.
+
+    put:
+      tags:
+        - config
+      summary: create or replace default user access rules. The default user access configuration is replaced with the request body content.
+      operationId: replaceUserAccess
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the user access rules
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/UserAccess'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/user-access/guardian:
+
+    get:
+      tags:
+        - config
+      summary: Returns the configured guardian user access rules.
+      operationId: getGuardianAccess
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/GuardianAccess'
+        '500':
+          description: An internal error occured trying to retrieve the user access rights.
+
+    put:
+      tags:
+        - config
+      summary: configure guardian user access rules. Replaces the configured rules with the input request body.
+      operationId: replaceGuardianAccess
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the access rules for guardians of users who are children
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/GuardianAccess'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+  /config/user-access/overrides:
+
+    get:
+      tags:
+        - config
+      summary: get one or all of the user access overrides
+      operationId: getUserAccessOverrides
+      parameters:
+        - in: query
+          name: overrideName
+          schema:
+            type: string
+          required: false
+          description: if present, only the named override will be returned
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './config_schema.yml#/components/schemas/UserAccessOverrides'
+        '404':
+          description: An overrideName was present, but the identified override is unknown.
+        '500':
+          description: an internal error occurred, any error message will be in the response body
+
+    put:
+      tags:
+        - config
+      summary: The definition of user access overrides will be replaced by the request body configuration.
+      operationId: replaceUserAccessOverrides
+      parameters:
+        - $ref: './config_schema.yml#/components/parameters/MinorChangeQueryParameter'
+      requestBody:
+        description: the override configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './config_schema.yml#/components/schemas/UserAccessOverrides'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: error reading or parsing the request body, any error message will be in the response body
+        '404':
+          description: The input contained multiple overrides for the same location or for age, or when merged with existing overrides there were duplicates
         '500':
           description: an internal error occurred, any error message will be in the response body
 
