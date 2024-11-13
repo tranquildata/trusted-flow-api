@@ -1398,7 +1398,17 @@ components:
         platformSharing:
           $ref: './config_schema.yml#/components/schemas/PlatformSharingPurposes'
         userAccess:
-          $ref: './config_schema.yml#/components/schemas/UserAccess'
+          type: object
+          title: PersonalizedUserCategories
+          properties:
+            categoryIds:
+              description: The set of categories that this user has access to
+              $ref: './config_schema.yml#/components/schemas/CategoryIdentifiers'
+            guardianAccessCategroryIds:
+              description: The set of categories (if any) that this user's guardians have access to
+              $ref: './config_schema.yml#/components/schemas/CategoryIdentifiers'
+          required:
+            - categoryIds
         contractualExchange:
           allOf:
             - $ref: '#/components/schemas/ContractualRelationship'
