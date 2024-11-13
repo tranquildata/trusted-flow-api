@@ -99,7 +99,7 @@ components:
             propertyName:
               type: string
               enum:
-                - dob
+                - age
                 - location
               description: The name of a user property
             values:
@@ -293,7 +293,7 @@ components:
             propertyName:
               type: string
               enum:
-                - dob
+                - age
                 - location
               description: The name of a user property
             values:
