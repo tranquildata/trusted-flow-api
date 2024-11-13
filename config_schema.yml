@@ -19,7 +19,7 @@ components:
           type: string
           description: |
             An immutable identity that is stable even as associated human-readable names change. This identity must be
-            globally unique, so that any given entity (e.g., a Category or a Purpose) can be uniquly identified.
+            globally unique, so that any given entity (e.g., a Category or a Purpose) can be uniquely identified.
       required:
         - stableId
 
@@ -174,7 +174,7 @@ components:
               items:
                 $ref: '#/components/schemas/ThirdParty'
             platformUsePurposeId:
-              description: If this Platfrom Sharing Purpose is in-support of a Platfrom Use Purpose then that use is identified here.
+              description: If this Platform Sharing Purpose is in-support of a Platform Use Purpose then that use is identified here.
               type: string
           required:
             - categoryCeilingIds
