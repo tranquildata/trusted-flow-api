@@ -198,7 +198,7 @@ paths:
         2. *Affirmative Consents* allow a user to share under one or more relationships, where some other party has requested
             specific categories but the user is free to share all or a subset of those categories. Common examples would be sharing
             between multiple applications from the same company, or sharing data with a research group in-exchange for feedback to the user.
-        3. *Personal Sharing* allows a user to share categories of their choice with any other known user. Common examples would be sharing
+        3. *Personal Sharing* allows a user to share categories of their choice with any individual. Common examples would be sharing
             with a family member or a friend.
 
         At any point a user may change the scope of their consents. A call to this routine that names a specific consent with no
@@ -1304,8 +1304,10 @@ components:
       in: query
       required: false
       description: |
-        The purpose of the request. No purpose is required for the `userAccess` request type. For all other request
-        types, a valid purpose identified in the given type is required.
+        The purpose of the request. No purpose is required for the `userAccess` request type. If this is a request to
+        share data via "personal sharing" then the request type should be `consentedSharing` and the value
+        of the purpose should be `personal-sharing`. For all other request types, a valid purpose identifier for the
+        given request type is required.
       schema:
         type: string
 
@@ -1314,13 +1316,13 @@ components:
       in: query
       required: true
       description: |
-        The type of use being requested:
+        The type of the request:
 
         * `platformUse` requests are for the platform's own internal data use
-        * `platformSharing` requests are when the platform needs to share data with third parties to fulfil a specified purpose
-        * `userAccess` requests are when a user of the platform is trying to access data
-        * `contractualExchange` requests are when a third party that has partnered with the platform is exchanging data with the platform
-        * `consentedSharing` requests are for third parties that users have explicitly consented to share with
+        * `platformSharing` requests are for the platform to share data with third parties in support of some purpose
+        * `userAccess` requests are for a user of the platform accessing data
+        * `contractualExchange` requests are for sharing data under contractual terms
+        * `consentedSharing` requests are for sharing data under consented terms or via "personal sharing"
       schema:
         type: string
         enum:
@@ -1341,7 +1343,8 @@ components:
         For `platformSharing` the subject must be the identifier for one of the third parties supporting the stated
         purpose. For `userAccess` the subject must be a user provisioned via [upsertUser()](#api-User-upsertUser).
         For `contractualExchange` and `consentedSharing` the subject must identify a specific set of terms from
-        the identified purpose.
+        the identified purpose, or in the case of "personal sharing", the subject must identify someone who the user
+        has consented to share with.
       schema:
         type: string
 
@@ -1404,7 +1407,7 @@ components:
             categoryIds:
               description: The set of categories that this user has access to
               $ref: './config_schema.yml#/components/schemas/CategoryIdentifiers'
-            guardianAccessCategroryIds:
+            guardianAccessCategoryIds:
               description: The set of categories (if any) that this user's guardians have access to
               $ref: './config_schema.yml#/components/schemas/CategoryIdentifiers'
           required:
