@@ -204,6 +204,13 @@ paths:
         At any point a user may change the scope of their consents. A call to this routine that names a specific consent with no
         categories will revoke that consent relationship.
       operationId: upsertConsent
+      parameters:
+        - in: query
+          name: consentingId
+          schema:
+            type: string
+          required: false
+          description: Identifier of the user or guardian who is requesting the consent update
       requestBody:
         description: Acknowledges consent from a user
         required: true
