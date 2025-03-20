@@ -1702,6 +1702,23 @@ components:
         recordField:
           type: string
           description: the identifier of the field in a format compatible with the underlying data provider
+        recordJoinValue:
+          type: object
+          properties:
+            fieldNames:
+              type: array
+              items: 
+                type: string
+              description: an array of the field names to combine to construct the record value
+            delimiter:
+              type: string
+              description: the separator to put between the elements of fields
+           description: >
+             Some data formats spread out the components of record name across multiple fields. In those cases you can specify
+             the name with a join value. The name will be assembled by concatenating the values of the fields listed in fields
+             separating the values with the specified delimiter. For example if the record name should be 'Invoice/1234', but the
+             values are contained across the fields 'type' (with value 'Invoice')  and 'identifier.id' (with value '1234'), you would 
+             use a recordJoinValue with 'fieldNames' set to ['type', 'identifier.id'] and 'delimiter' set to '/'.
         categoryId:
           type: string
           description: the stable identifier of the category that the record field maps to
@@ -1725,6 +1742,17 @@ components:
             user_id is in the field named `id` and the `type` field is "user". But for customer records, the user_id is in the field
             named `cust_id` when the `type` field has the value "customer". To handle this case, two mappings would be defined. One
             would have field match rules set to match `type` against "user" and the other would match `type` against "customer".
+        tag:
+          type: boolean
+          description: if true, this field is just a tag not a value-bearing property. The default is false
+        score:
+          type: integer
+          description: >
+            Specifies a score value that this field will carry. The scores of all fields in a record can be summed up to produce
+            a total score. This is useful for policies that are interested in thresholding or weighting.
+      required:
+        - categoryId
+        - fieldId
 
     MappingGroup:
       type: object
