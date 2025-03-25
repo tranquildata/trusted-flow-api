@@ -1743,8 +1743,13 @@ components:
             named `cust_id` when the `type` field has the value "customer". To handle this case, two mappings would be defined. One
             would have field match rules set to match `type` against "user" and the other would match `type` against "customer".
         tag:
-          type: boolean
-          description: if true, this field is just a tag not a value-bearing property. The default is false
+          type: string
+          description: >
+            if non-empty, this field is a tag. The value of this field will be this tag value rather than the value from the record itself.
+            This can be useful for cases where the actual field value is unimportant, or shouldn't be stored, but the fact that the field was
+            present is important. For example if the record had an 'Address' field that held the user's address, that could be marked with a 'PII' tag.
+            The actual address wouldn't be stored in the appliance, but we would be able to mark the record as containing Personally Identifiable
+            Information, which could be important for later policy decisions.
         score:
           type: integer
           description: >
