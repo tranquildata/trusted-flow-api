@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024, Tranquil Data, Inc. All rights reserved.
+# Copyright (c) 2023-2025, Tranquil Data, Inc. All rights reserved.
 
 # Note that this definition uses two patterns that OpenAPI generators ignore by default:
 #  1. alias to array
@@ -1702,6 +1702,23 @@ components:
         recordField:
           type: string
           description: the identifier of the field in a format compatible with the underlying data provider
+        recordJoinValue:
+          type: object
+          properties:
+            fieldNames:
+              type: array
+              items: 
+                type: string
+              description: an array of the field names to combine to construct the field value
+            delimiter:
+              type: string
+              description: the separator to put between the elements of fields
+           description: >
+             Some data formats spread out the components of property name across multiple fields. In those cases you can specify
+             the name with a join value. The name will be assembled by concatenating the values of the fields listed in fieldNames
+             separating the values with the specified delimiter. For example if the record name should be 'Invoice/1234', but the
+             values are contained across the fields 'type' (with value 'Invoice')  and 'identifier.id' (with value '1234'), you would 
+             use a recordJoinValue with 'fieldNames' set to ['type', 'identifier.id'] and 'delimiter' set to '/'.
         categoryId:
           type: string
           description: the stable identifier of the category that the record field maps to
@@ -1725,6 +1742,19 @@ components:
             user_id is in the field named `id` and the `type` field is "user". But for customer records, the user_id is in the field
             named `cust_id` when the `type` field has the value "customer". To handle this case, two mappings would be defined. One
             would have field match rules set to match `type` against "user" and the other would match `type` against "customer".
+        tag:
+          type: string
+          description: >
+            if non-empty, this field is a tag. The value of this field will be this tag value rather than the value from the record itself.
+            This can be useful for cases where the actual field value is unimportant, or shouldn't be stored, but the fact that the field was
+            present is important. For example if the record had an 'Address' field that held the user's address, that could be marked with a 'PII' tag.
+            The actual address wouldn't be stored in the appliance, but we would be able to mark the record as containing Personally Identifiable
+            Information, which could be important for later policy decisions.
+        score:
+          type: integer
+          description: >
+            Specifies a score value that this field will carry. The scores of all fields in a record can be summed up to produce
+            a total score. This is useful for policies that are interested in thresholding or weighting.
 
     MappingGroup:
       type: object
