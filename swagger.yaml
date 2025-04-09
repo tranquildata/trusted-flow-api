@@ -99,6 +99,34 @@ paths:
         '500':
           description: There was an internal error attempting to resolve the user's status
 
+    post:
+      tags:
+        - user
+      summary: Creates a new user and their details
+      description: |
+        This follows the description of the `PUT` form except that this will fail if the user already exists.
+      operationId: createUser
+      requestBody:
+        description: creates a user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCore'
+            example:
+                userId: Alice
+                attributes:
+                  - state: CA
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: The expected request content was invalid, not provided, or named a user that could not be created
+        '409':
+          description: The user already exists
+        '500':
+          description: There was an internal error creating the user
+
     put:
       tags:
         - user
@@ -137,7 +165,7 @@ paths:
         '200':
           description: OK
         '400':
-          description: The expected request content was not provided
+          description: The expected request content was invalid or not provided
         '500':
           description: There was an internal error saving the updated user
 
