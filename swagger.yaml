@@ -122,6 +122,13 @@ paths:
           child. The value is a string in ISO 8601 form like `2017-01-23` 
         * `location` represents the physical location used in overrides.
       operationId: upsertUser
+      parameters:
+        - in: query
+          name: acceptOnCreate
+          schema:
+            type: boolean
+          required: false
+          description: True if the user is accepting platform terms as part of this operation
       requestBody:
         description: upserts a user
         required: true
