@@ -1346,7 +1346,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: '#/components/schemas/ExportedDatastores'
                 description: a mapping from datastore id to ExportResponse
         '404':
           description: No exports are configured
@@ -1363,7 +1363,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/ExportConfig'
               description: a map of properties to values for configuring
       responses:
         '200':
@@ -1394,7 +1394,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/ExportConfig'
               description: a map of properties to values for configuring
       responses:
         '200':
@@ -1960,6 +1960,36 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MappingGroup'
+
+    ExportConfig:
+      type: object
+      properties:
+        type:
+          type: string
+          description: the datastore type that is exported
+      required:
+        - type
+      additionalProperties: true
+
+    ExportedDatastore:
+      type: object
+      properties:
+        type:
+          type: string
+          description: the datastore type that is exported
+        active:
+          type: boolean
+          description: true if the datastore is currently exported, false otherwise
+      required:
+        - type
+        - active
+      additionalProperties: true
+
+    ExportedDatastores:
+      type: object
+      description: a dictionary of datastore names to their configurations
+      additionalProperties:
+        $ref: '#/components/schemas/ExportedDatastore'
 
     ExportResponse:
       type: object
