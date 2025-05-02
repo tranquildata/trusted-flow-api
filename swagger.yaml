@@ -38,6 +38,8 @@ tags:
     description: Policy and system configuration routines
   - name: mapping
     description: Record mapping routines
+  - name: export
+    description: Database export routines
 
 servers:
   - url: http://localhost
@@ -1332,6 +1334,146 @@ paths:
         '500':
           description: an internal error ocurred while processing the delete, any error message will be in the response body
 
+  /export:
+    get:
+      tags:
+        - export
+      summary: returns all the currently configured datastores
+      operationId: getExports
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: a mapping from datastore id to ExportResponse
+        '404':
+          description: No exports are configured
+        '500':
+          description: The appliance had an error serving the request, the response body will contain a detailed message
+    post:
+      tags:
+        - export
+      summary: create a new export
+      operationId: createExport
+      requestBody:
+        description: the exported datastore configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: a map of properties to values for configuring
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResponse'
+        '400':
+          description: badly formatted request, details are in the response body
+        '500':
+          description: an error occurred when attempting to export the datastore, details are in the response body
+    put:
+      tags:
+        - export
+      summary: update an export
+      operationId: updateExport
+      parameters:
+        - in: query
+          name: datastoreId
+          schema:
+            type: string
+          required: true
+          description: the name of the datstore to update
+      requestBody:
+        description: the exported datastore configuration
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: a map of properties to values for configuring
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResponse'
+        '400':
+          description: badly formatted request, details are in the response body
+        '500':
+          description: an error occurred when attempting to export the datastore, details are in the response body
+    delete:
+      tags:
+        - export
+      summary: stop an export (if active) and remove it from configuration
+      operationId: removeExport
+      parameters:
+        - in: query
+          name: datastoreId
+          schema:
+            type: string
+          required: true
+          description: the name of the datstore to remove
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: badly formatted request, details are in the response body
+        '500':
+          description: an error occurred when attempting to export the datastore, details are in the response body
+  /start:
+    put:
+      tags:
+        - export
+      summary: start exporting a configured inactive datastore
+      operationId: startExport
+      parameters:
+        - in: query
+          name: datastoreId
+          schema:
+            type: string
+          required: true
+          description: the name of the datastore to start exporting
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResponse'
+        '400':
+          description: badly formatted request or missing datastore id query parameter, details are in the response body
+        '500':
+          description: an error occurred when attempting to export the datastore, details are in the response body
+  /stop:
+    put:
+      tags:
+        - export
+      summary: stop exporting a configured datastore, but do not remove from the configuration
+      operationId: stopExport
+      parameters:
+        - in: query
+          name: datastoreId
+          schema:
+            type: string
+          required: true
+          description: the name of the datstore to stop exporting
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportResponse'
+        '400':
+          description: badly formatted request or missing datastore id query parameter, details are in the response body
+        '500':
+          description: an error occurred when attempting to export the datastore, details are in the response body
 
 components:
 
@@ -1818,3 +1960,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MappingGroup'
+
+    ExportResponse:
+      type: object
+      properties:
+        port:
+          type: number
+          description: the port that is serving this export
+        type:
+          type: string
+          description: the datastore type that is exported
+        name:
+          type: string
+          description: an identifier for the datastore
+        active:
+          type: boolean
+          description: true if the datastore is currently exported, false if not
