@@ -1347,9 +1347,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExportedDatastores'
-                description: a mapping from datastore id to ExportResponse
-        '404':
-          description: No exports are configured
+                description: a mapping from datastore id to ExportResponse. if no datastores are configured an empty mapping is returned
         '500':
           description: The appliance had an error serving the request, the response body will contain a detailed message
     post:
