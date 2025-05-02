@@ -39,7 +39,7 @@ tags:
   - name: mapping
     description: Record mapping routines
   - name: export
-    description: Database export routines
+    description: Datastore export routines
 
 servers:
   - url: http://localhost
@@ -1387,7 +1387,7 @@ paths:
           schema:
             type: string
           required: true
-          description: the name of the datstore to update
+          description: the identifier of the datstore to update
       requestBody:
         description: the exported datastore configuration
         required: true
@@ -1405,6 +1405,8 @@ paths:
                 $ref: '#/components/schemas/ExportResponse'
         '400':
           description: badly formatted request, details are in the response body
+        '404':
+          description: datastoreId is not the identifier of a configured datastore
         '500':
           description: an error occurred when attempting to export the datastore, details are in the response body
     delete:
@@ -1418,12 +1420,14 @@ paths:
           schema:
             type: string
           required: true
-          description: the name of the datstore to remove
+          description: the identifier of the datstore to remove
       responses:
         '200':
           description: OK
         '400':
           description: badly formatted request, details are in the response body
+        '404':
+          description: datastoreId is not the identifier of a configured datastore
         '500':
           description: an error occurred when attempting to export the datastore, details are in the response body
   /start:
@@ -1438,7 +1442,7 @@ paths:
           schema:
             type: string
           required: true
-          description: the name of the datastore to start exporting
+          description: the identifier of the datastore to start exporting
       responses:
         '200':
           description: OK
@@ -1448,6 +1452,8 @@ paths:
                 $ref: '#/components/schemas/ExportResponse'
         '400':
           description: badly formatted request or missing datastore id query parameter, details are in the response body
+        '404':
+          description: datastoreId is not the identifier of a configured datastore
         '500':
           description: an error occurred when attempting to export the datastore, details are in the response body
   /stop:
@@ -1462,7 +1468,7 @@ paths:
           schema:
             type: string
           required: true
-          description: the name of the datstore to stop exporting
+          description: the identifier of the datstore to stop exporting
       responses:
         '200':
           description: OK
@@ -1472,6 +1478,8 @@ paths:
                 $ref: '#/components/schemas/ExportResponse'
         '400':
           description: badly formatted request or missing datastore id query parameter, details are in the response body
+        '404':
+          description: datastoreId is not the identifier of a configured datastore
         '500':
           description: an error occurred when attempting to export the datastore, details are in the response body
 
@@ -1964,11 +1972,11 @@ components:
     ExportConfig:
       type: object
       properties:
-        type:
+        datastoreType:
           type: string
           description: the datastore type that is exported
       required:
-        - type
+        - datastoreType
       additionalProperties: true
 
     ExportedDatastore:
