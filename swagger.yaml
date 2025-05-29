@@ -660,7 +660,19 @@ paths:
 
         For documents of type `text/csv`, the content must be a standard CSV document in text form that starts with a single
         "header" line naming all of the fields in the document. Each of the following rows is treated as a single `record` and
-        evaluated independently. Both the header row and all following record rows must be comma-separated. 
+        evaluated independently. Both the header row and all following record rows must be comma-separated.
+
+        For documents of type `application/json` the document will be treated as a single `record`, unless it is formatted as a
+        JSON Lines document, in which case each line will be treated as a single `record` and evaluated independently.
+
+        For documents of type `application/xml` the document will be treated as a single `record`.
+
+        For documents of type `application/fhir+json` or `application/fhir+xml` the document will be treated as a single `record`,
+        unless the provided resource is a standard FHIR `bundle`, in which case each resource will be treated as a single `record`
+        and evaluated independently.
+
+        For documents of type application/octet-stream the service will attempt to resolve the magic number and see if the
+        contents represent a Parquet document.
       operationId: redactDocument
       parameters:
         - $ref: '#/components/parameters/PurposeQueryParameter'
@@ -672,6 +684,24 @@ paths:
         required: true
         content:
           text/csv:
+            schema:
+              type: string
+          application/json:
+            schema:
+              type: string
+          application/xml:
+            schema:
+              type: string
+          application/fhir+json:
+            schema:
+              type: string
+          application/fhir+xml:
+            schema:
+              type: string
+          application/vnd.apache.parquet:
+            schema:
+              type: string
+          application/octet-stream:
             schema:
               type: string
       responses:
