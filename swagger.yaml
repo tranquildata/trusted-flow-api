@@ -14,8 +14,8 @@ info:
   title: Tranquil Data (TM) Trusted Flow Edition APIs
   description: |
     This is the complete API documentation for the product. It covers routines for
-    automating configuration, onboarding users and their guardians, asking for audited
-    decisions to be made, and redacting documents like CSVs.
+    automating configuration, onboarding users and their guardians, exporting interfaces,
+    and redacting documents.
   version: 1.0.0
   license:
     name: "Apache 2.0"
@@ -30,8 +30,6 @@ tags:
     description: Core health and management routines
   - name: user
     description: User-oriented routines
-  - name: decision
-    description: Decision-oriented routines
   - name: redact
     description: Document redaction routines
   - name: config
@@ -558,58 +556,6 @@ paths:
           description: The contractual purpose or terms are unknown
         '500':
           description: There was an internal error generating the personalized terms from context
-
-  #
-  # Decision API paths
-  #  
-
-  /decision:
-
-    put:
-      tags:
-        - decision
-      summary: Returns a decision and rationale for using data against a stated purpose
-      operationId: getDecisionForPurpose
-      parameters:
-        - $ref: '#/components/parameters/PurposeQueryParameter'
-        - $ref: '#/components/parameters/UseQueryParameter'
-        - $ref: '#/components/parameters/SubjectQueryParameter'
-        - $ref: '#/components/parameters/MappingGroupQueryParameter'
-      requestBody:
-        description: the decision request, specifying the fields requested, the requestor, purpose, and the resource subject
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DecisionQuery'
-            example:
-              fields:
-                - name: user_id
-                  value: user1234
-                - name: service_provider
-                  value: DoctorExample
-                - name: date_of_service
-                  value: 01-01-1970
-              returnAllowedFields: true
-      responses:
-        '200':
-          description: The requested purpose is valid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DecisionResponse'
-              example:
-                permitted: true
-                message: Contractual rights allow access to the requested member categories
-        '409':
-          description: The requested purpose is invalid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DecisionResponse'
-              example:
-                permitted: false
-                message: User does not have a contractual relationship with the requestor
 
   #
   # Redaction API paths
@@ -1808,47 +1754,6 @@ components:
       required:
         - guardianId
         - child
-
-    #
-    # Structures used by the Decision APIs
-    #
-
-    DecisionField:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          type: string
-      required:
-        - name
-
-    DecisionQuery:
-      type: object
-      properties:
-        fields:
-          type: array
-          items:
-            $ref: '#/components/schemas/DecisionField'
-        returnAllowedFields:
-          type: boolean
-      required:
-        - fields
-
-    DecisionResponse:
-      type: object
-      properties:
-        permitted:
-          type: boolean
-        message:
-          type: string
-        allowedFields:
-          type: array
-          items:
-            type: string
-      required:
-        - permitted
-        - message
 
     #
     # Structures used by the Redact APIs
