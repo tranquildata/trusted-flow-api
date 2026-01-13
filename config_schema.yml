@@ -56,17 +56,21 @@ components:
 
     Category:
       allOf:
-        - $ref: '#/components/schemas/EntityWithDetails'
         - $ref: '#/components/schemas/ReferencedEntity'
         - type: object
           properties:
+            name:
+              type: string
+              description: the name of the field
+            fullDescription:
+              type: string
             fields:
               type: array
               items:
                 $ref: '#/components/schemas/Field'
               description: a collection of named fields describing distinct instances and varieties of this category of data
           required:
-            - fields
+            - name
 
     Categories:
       type: object
